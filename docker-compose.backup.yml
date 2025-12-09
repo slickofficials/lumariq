@@ -1,0 +1,121 @@
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: lumariq-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lumariq_dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: lumariq-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: lumariq-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: lumariq-api-gateway
+    restart: always
+    environment:
+      - PORT=3050
+      - NODE_ENV=production
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - USERS_URL=http://users-service:3001
+      - KYC_URL=http://kyc-service:4100
+      - LEGAL_URL=http://legal-service:4200
+      - ORDERS_URL=http://orders-service:4000
+      - DISPATCH_URL=http://dispatch-service:8080
+      - WALLET_URL=http://wallet-ledger:7070
+      - RATE_LIMIT_WINDOW=60
+      - RATE_LIMIT_MAX=200
+    ports:
+      - "3050:3050"
+    depends_on:
+      - users-service
+      - kyc-service
+      - legal-service
+      - orders-service
+      - dispatch-service
+      - wallet-ledger
+
+  users-service:
+    build: ./services/users-service
+    container_name: lumariq-users-service
+    restart: always
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/lumariq_dev
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+
+  kyc-service:
+    build: ./services/kyc-service
+    container_name: lumariq-kyc-service
+    restart: always
+    environment:
+      - PORT=4100
+    ports:
+      - "4100:4100"
+
+  legal-service:
+    build: ./services/legal-service
+    container_name: lumariq-legal-service
+    restart: always
+    environment:
+      - PORT=4200
+    ports:
+      - "4200:4200"
+
+  orders-service:
+    build: ./services/orders-service
+    container_name: lumariq-orders-service
+    restart: always
+    environment:
+      - PORT=4000
+    ports:
+      - "4000:4000"
+
+  dispatch-service:
+    build: ./services/dispatch-service
+    container_name: lumariq-dispatch-service
+    restart: always
+    environment:
+      - PORT=8080
+    ports:
+      - "8080:8080"
+
+  wallet-ledger:
+    build: ./services/wallet-ledger
+    container_name: lumariq-wallet-ledger
+    restart: always
+    environment:
+      - PORT=7070
+    ports:
+      - "7070:7070"
+
+volumes:
+  pgdata:

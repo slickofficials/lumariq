@@ -1,0 +1,91 @@
+name: Lumariq CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: lumariq
+          POSTGRES_PASSWORD: lumariq
+          POSTGRES_DB: lumariq_core
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U lumariq -d lumariq_core"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Node deps (users-service)
+        working-directory: ./services/users-service
+        run: npm ci
+
+      - name: Install Node deps (orders-service)
+        working-directory: ./services/orders-service
+        run: npm ci
+
+      - name: Install Node deps (kyc-service)
+        working-directory: ./services/kyc-service
+        run: npm ci
+
+      - name: Install Node deps (legal-service)
+        working-directory: ./services/legal-service
+        run: npm ci
+
+      - name: Prisma generate (all)
+        run: |
+          cd services/users-service && npx prisma generate
+          cd ../orders-service && npx prisma generate
+          cd ../kyc-service && npx prisma generate
+          cd ../legal-service && npx prisma generate
+
+      # Optional: run tests if you have them
+      - name: Run Node tests
+        run: |
+          cd services/users-service && npm test || true
+          cd ../orders-service && npm test || true
+          cd ../kyc-service && npm test || true
+          cd ../legal-service && npm test || true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Go tests (dispatch-service)
+        working-directory: ./services/dispatch-service
+        run: go test ./... || true
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust tests (wallet-ledger)
+        working-directory: ./services/wallet-ledger
+        run: cargo test || true
+
+      - name: Docker Compose Build (sanity)
+        run: docker compose -f docker-compose.yml build

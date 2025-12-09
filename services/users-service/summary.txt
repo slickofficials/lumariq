@@ -1,0 +1,5 @@
+SERVICE: users-service
+Framework: Express
+Database: None
+Auth: JWT
+Extra deps: @prisma/client, bcryptjs, cors, express, jsonwebtoken, morgan
