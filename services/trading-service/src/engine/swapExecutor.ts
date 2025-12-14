@@ -8,7 +8,7 @@ export async function swapExactIn(
   side: "BUY" | "SELL",
   minAmountOut?: number
 ) {
-  const pool = await prisma.liquidityPool.findUnique({
+  const pool = await prisma.liquidityPool.findUnique({ include: { providers: true }, 
     where: { symbol }
   });
 

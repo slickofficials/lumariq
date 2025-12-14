@@ -7,7 +7,7 @@ export async function addLiquidity(
   amountBase: number,
   amountQuote: number
 ) {
-  const pool = await prisma.liquidityPool.findUnique({
+  const pool = await prisma.liquidityPool.findUnique({ include: { providers: true }, 
     where: { symbol },
   });
 
@@ -50,13 +50,13 @@ export async function removeLiquidity(
   userId: number | string,
   shares: number
 ) {
-  const pool = await prisma.liquidityPool.findUnique({
+  const pool = await prisma.liquidityPool.findUnique({ include: { providers: true }, 
     where: { symbol },
   });
 
   if (!pool) throw new Error("Pool not found");
 
-  const lp = await prisma.liquidityProvider.findFirst({
+  const lp = await prisma.liquidityProvider.findFirst({ 
     where: {
       poolId: pool.id,
       userId: Number(userId),

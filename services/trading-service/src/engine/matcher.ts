@@ -1,46 +1,67 @@
+import { enqueueMatchJob } from "./jobQueue";
 import { prisma } from "../prisma";
-import { createExecution } from "./executor";
-import { executeAMM } from "./amm";
+import { executeMatch } from "./executor";
+import { checkCircuitBreaker } from "./circuitBreaker";
 
-export async function matchOrder(order: any) {
-  const saved = await prisma.tradeOrder.create({ data: order });
+/**
+ * Match an incoming order against the orderbook
+ */
+export async function matchOrder(order: {
+  id: number;
+  symbol: string;
+  side: "BUY" | "SELL";
+  amount: number;
+  price?: number;
+}) {
+  checkCircuitBreaker(order.price ?? 0);
 
-  const opposite = order.side === "BUY" ? "SELL" : "BUY";
+  const oppositeSide = order.side === "BUY" ? "SELL" : "BUY";
 
   const match = await prisma.tradeOrder.findFirst({
     where: {
       symbol: order.symbol,
-      side: opposite,
+      side: oppositeSide,
       status: "OPEN",
-      price: opposite === "SELL"
-        ? { lte: order.price }
-        : { gte: order.price }
+      price:
+        order.price != null
+          ? order.side === "BUY"
+            ? { lte: order.price }
+            : { gte: order.price }
+          : undefined
     },
     orderBy: { createdAt: "asc" }
   });
 
-  if (match) {
-    if (order.side === "BUY") await createExecution(saved, match);
-    else await createExecution(match, saved);
+  if (!match) {
     return;
   }
 
-  console.log("🧪 No orderbook match → AMM fallback");
+  if (order.side === "BUY") {
+    await enqueueMatchJob({
+      buyOrderId: order.id,
+      sellOrderId: match.id,
+      price: order.price ?? match.price ?? 0
+    });
+  } else {
+    await enqueueMatchJob({
+      buyOrderId: match.id,
+      sellOrderId: order.id,
+      price: match.price ?? order.price ?? 0
+    });
+  }
+}
 
-  const ammPrice = await executeAMM(saved);
-  if (!ammPrice) return;
-
-  const virtual = await prisma.tradeOrder.create({
-    data: {
-      userId: 0,
-      symbol: order.symbol,
-      side: opposite,
-      quantity: order.quantity,
-      price: ammPrice,
-      status: "FILLED"
-    }
-  });
-
-  if (order.side === "BUY") await createExecution(saved, virtual);
-  else await createExecution(virtual, saved);
+/**
+ * Used when a virtual / synthetic order is created internally
+ */
+export async function matchVirtualOrder(
+  order: {
+    id: number;
+    symbol: string;
+    side: "BUY" | "SELL";
+    amount: number;
+    price?: number;
+  }
+) {
+  return matchOrder(order);
 }
