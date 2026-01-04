@@ -82,3 +82,18 @@ pub async fn debit(
     tx.commit().await.map_err(|e| e.to_string())?;
     Ok(())
 }
+// --- Idempotency guard (ledger-safe) ---
+pub async fn has_idempotency(
+    db: &Pool<Postgres>,
+    key: &str,
+) -> Result<bool, String> {
+    let rec = sqlx::query!(
+        "SELECT 1 FROM ledger_entries WHERE reference = $1 LIMIT 1",
+        key
+    )
+    .fetch_optional(db)
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(rec.is_some())
+}

@@ -1,0 +1,6 @@
+{
+  "default_days": 30,
+  "legal_hold": false,
+  "delete_ciphertext_after_days": 30,
+  "delete_metadata_after_days": 90
+}

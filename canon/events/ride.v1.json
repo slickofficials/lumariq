@@ -1,0 +1,9 @@
+{
+  "name": "ride.completed",
+  "version": 1,
+  "schema": {
+    "rideId": "string",
+    "driverId": "string",
+    "ts": "iso8601"
+  }
+}

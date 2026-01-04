@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "tiers": [
+    { "name": "base", "rewardMinor": 500 },
+    { "name": "power", "rewardMinor": 1000 }
+  ],
+  "caps": {
+    "perUserPerMonthMinor": 5000,
+    "perDevice": 1
+  },
+  "eligibility": ["first_ride_completed"],
+  "antiAbuse": ["device_fingerprint", "kyc_required"]
+}

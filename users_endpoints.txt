@@ -1,0 +1,11 @@
+services/users-service/src/routes/auth.routes.ts:const router = Router();
+services/users-service/src/routes/auth.routes.ts:router.post("/register", authLimiter, validate(registerSchema), register);
+services/users-service/src/routes/auth.routes.ts:router.post("/login", loginLimiter, validate(loginSchema), login);
+services/users-service/src/routes/auth.routes.ts:router.post("/refresh", authLimiter, validate(refreshSchema), refreshToken);
+services/users-service/src/routes/auth.routes.ts:router.get("/health", (_req, res) => {
+services/users-service/src/routes/auth.routes.ts:export default router;
+services/users-service/src/routes.ts:const router = Router();
+services/users-service/src/routes.ts:router.post("/auth/register", register);
+services/users-service/src/routes.ts:router.post("/auth/login", login);
+services/users-service/src/routes.ts:router.post("/auth/refresh", refreshToken);
+services/users-service/src/routes.ts:export default router;

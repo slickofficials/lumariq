@@ -1,0 +1,27 @@
+{
+  "country": "Nigeria",
+  "iso": "NG",
+  "currency": "NGN",
+  "timezone": "Africa/Lagos",
+  "payments": {
+    "primary": "paystack",
+    "secondary": ["flutterwave", "stripe"]
+  },
+  "features": {
+    "bnpl": true,
+    "p2p": true,
+    "escrow": true,
+    "virtual_cards": true,
+    "whatsapp_bots": true
+  },
+  "compliance": {
+    "kyc": "tiered",
+    "aml": true,
+    "bvn_optional": true
+  },
+  "limits": {
+    "wallet_daily": 500000,
+    "p2p_daily": 200000,
+    "bnpl_max": 100000
+  }
+}

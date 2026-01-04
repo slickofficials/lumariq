@@ -1,0 +1,8 @@
+{
+  "rules": [
+    { "type": "finance", "requires_human": true },
+    { "type": "health", "requires_disclaimer": true },
+    { "type": "legal", "read_only": true }
+  ],
+  "kill_switch": true
+}

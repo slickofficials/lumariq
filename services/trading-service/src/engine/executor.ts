@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../__stubs__/prisma";
 import { prisma } from "../prisma";
 import { settleTrade } from "./settlement";
 import { enforceTradingEnabled } from "./risk";

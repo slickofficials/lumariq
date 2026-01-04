@@ -1,0 +1,12 @@
+{
+  "events": [
+    "order.created",
+    "order.completed",
+    "ride.completed",
+    "wallet.credit",
+    "wallet.debit",
+    "referral.reward.eligible",
+    "referral.reward.paid"
+  ],
+  "rule": "All events are append-only and idempotent"
+}

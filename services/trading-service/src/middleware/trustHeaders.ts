@@ -1,14 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { randomUUID } from "crypto";
+import type { Request, Response, NextFunction } from "express";
 
-export function trustHeaders(req: Request, res: Response, next: NextFunction) {
-  const requestId = randomUUID();
-  res.setHeader("X-Request-Id", requestId);
-
-  const apiKey = (req as any).apiKey;
-  if (apiKey?.rateLimitRpm) {
-    res.setHeader("X-RateLimit-Limit", apiKey.rateLimitRpm);
-  }
-
+export function trustHeaders(_req: Request, res: Response, next: NextFunction) {
+  res.setHeader("x-content-type-options", "nosniff");
+  res.setHeader("x-frame-options", "DENY");
+  res.setHeader("referrer-policy", "no-referrer");
   next();
 }

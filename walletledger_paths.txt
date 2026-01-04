@@ -1,0 +1,12 @@
+services/wallet-ledger/.env
+services/wallet-ledger/Cargo.lock
+services/wallet-ledger/Cargo.toml
+services/wallet-ledger/Dockerfile
+services/wallet-ledger/migrations/0001_create_wallets.sql
+services/wallet-ledger/migrations/0002_create_ledger_en-tries.sql
+services/wallet-ledger/src/db.rs
+services/wallet-ledger/src/handlers.rs
+services/wallet-ledger/src/ledger.rs
+services/wallet-ledger/src/main.rs
+services/wallet-ledger/src/models.rs
+services/wallet-ledger/src/routes.rs

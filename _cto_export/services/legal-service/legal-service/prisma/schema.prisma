@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model Agreement {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // "driver_terms", "merchant_terms", "tos", "privacy"
+  version   String
+  url       String
+  signedAt  DateTime @default(now())
+}
+
+model Dispute {
+  id         String   @id @default(uuid())
+  userId     String
+  orderId    String?
+  category   String   // "billing", "driver", "merchant", "safety", etc.
+  description String
+  status     String   @default("open")
+  attachment String?
+  openedAt   DateTime @default(now())
+  resolvedAt DateTime?
+  resolution String?
+}

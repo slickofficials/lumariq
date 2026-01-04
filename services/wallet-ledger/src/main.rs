@@ -1,19 +1,28 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpServer, web};
+use sqlx::{Pool, Postgres};
 
-#[get("/health")]
-async fn health() -> impl Responder {
-    HttpResponse::Ok().json(serde_json::json!({
-        "status": "wallet-ledger ok"
-    }))
-}
+mod models;
+mod db;
+mod ledger;
+mod routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     println!("🚀 Wallet Ledger service running on port 7070");
 
-    HttpServer::new(|| {
+    let database_url = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| {
+            "postgres://postgres:postgres@localhost:5432/lumariq".to_string()
+        });
+
+    let db: Pool<Postgres> = db::connect(&database_url)
+        .await
+        .expect("DB connect failed");
+
+    HttpServer::new(move || {
         App::new()
-            .service(health)
+            .app_data(web::Data::new(db.clone()))
+            .configure(routes::config)
     })
     .bind(("0.0.0.0", 7070))?
     .run()

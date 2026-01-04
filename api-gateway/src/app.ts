@@ -12,6 +12,7 @@ const app = express();
 app.use(helmet());
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(obs);
 app.use(morgan("combined"));
 
 const RATE_LIMIT_WINDOW = Number(process.env.RATE_LIMIT_WINDOW || 60) * 1000;

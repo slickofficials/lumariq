@@ -1,0 +1,15 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Lumariq Chat API", "version": "1.0.0" },
+  "paths": {
+    "/chat/threads": {
+      "post": { "summary": "Create thread", "responses": { "200": { "description": "ok" } } }
+    },
+    "/chat/messages": {
+      "post": { "summary": "Send message (ciphertext)", "responses": { "200": { "description": "ok" } } }
+    },
+    "/chat/reports": {
+      "post": { "summary": "Report abuse", "responses": { "200": { "description": "ok" } } }
+    }
+  }
+}

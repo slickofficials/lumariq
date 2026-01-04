@@ -1,0 +1,6 @@
+{
+  "e2e": true,
+  "moderation": "AI assisted, human override",
+  "retention_days": 90,
+  "legal_hold": true
+}

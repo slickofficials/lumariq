@@ -115,3 +115,12 @@ export async function updateOrderStatus(req: Request, res: Response) {
     return res.status(500).json({ error: "Failed to update order" });
   }
 }
+// --- Emit completion event for referral rewards ---
+if (updated.status === "completed") {
+  publishOrderEvent("order.completed", {
+    orderId: updated.id,
+    userId: updated.userId,
+    amount: updated.amount,
+    currency: updated.currency,
+  });
+}

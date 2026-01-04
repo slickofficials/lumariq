@@ -1,0 +1,22 @@
+{
+  "country": "Ghana",
+  "iso": "GH",
+  "currency": "GHS",
+  "timezone": "Africa/Accra",
+  "languages": ["en", "tw", "ga"],
+  "payments": {
+    "providers": ["paystack"],
+    "mobileMoney": ["MTN_MOMO", "VODAFONE_CASH", "AIRTELTIGO"]
+  },
+  "regulation": {
+    "kycLevel": "medium",
+    "bnplAllowed": true,
+    "escrowRequired": true
+  },
+  "features": {
+    "rideHailing": true,
+    "foodDelivery": true,
+    "logistics": true,
+    "crypto": false
+  }
+}

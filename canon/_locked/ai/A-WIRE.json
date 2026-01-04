@@ -1,0 +1,10 @@
+{
+  "agents": [
+    "merchant.copilot",
+    "driver.copilot",
+    "support.agent",
+    "dispatch.agent",
+    "accountant.agent"
+  ],
+  "policy": "Human override required for money + identity"
+}

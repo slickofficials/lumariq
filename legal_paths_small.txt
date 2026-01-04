@@ -1,0 +1,17 @@
+services/legal-service/.env
+services/legal-service/detect.js
+services/legal-service/dist/index.js
+services/legal-service/dist/routes.js
+services/legal-service/dist/server.js
+services/legal-service/Dockerfile
+services/legal-service/node_modules/.package-lock.json
+services/legal-service/package-lock.json
+services/legal-service/package.json
+services/legal-service/prisma/prisma.config.js
+services/legal-service/prisma/prisma.config.ts
+services/legal-service/prisma/schema.prisma
+services/legal-service/src/index.ts
+services/legal-service/src/routes.ts
+services/legal-service/src/server.ts
+services/legal-service/summary.txt
+services/legal-service/tsconfig.json

@@ -1,0 +1,11 @@
+{
+  "models": [
+    {
+      "id": "lumariq-core-llm",
+      "owner": "lumariq",
+      "allowed": true,
+      "risk": "medium",
+      "use": ["assistant", "search", "forecast"]
+    }
+  ]
+}

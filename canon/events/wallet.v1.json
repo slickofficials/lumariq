@@ -1,0 +1,11 @@
+{
+  "name": "wallet.credit",
+  "version": 1,
+  "schema": {
+    "userId": "number",
+    "amount": "number",
+    "currency": "string",
+    "reference": "string",
+    "ts": "iso8601"
+  }
+}

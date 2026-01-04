@@ -1,0 +1,6 @@
+{
+  "NG": { "region": "africa-lagos", "db": "postgres", "object_store": "s3", "retention_days": 30 },
+  "GH": { "region": "africa-accra", "db": "postgres", "object_store": "s3", "retention_days": 30 },
+  "BJ": { "region": "africa-cotonou", "db": "postgres", "object_store": "s3", "retention_days": 30 },
+  "default": { "region": "eu-west-1", "db": "postgres", "object_store": "s3", "retention_days": 14 }
+}

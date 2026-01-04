@@ -1,0 +1,16 @@
+./.env
+./.env.local
+./api-gateway/.env
+./services/dispatch-service/.env
+./services/kyc-service/.env
+./services/legal-service/.env
+./services/orders-service/.env
+./services/trading-service/.env
+./services/trading-service/.env.production
+./services/users-service/.env
+./services/wallet-ledger/.env
+./services/wallet-service/.env
+./_cto_export/services/dispatch-service/dispatch-service/.env
+./_cto_export/services/kyc-service/kyc-service/.env
+./_cto_export/services/legal-service/legal-service/.env
+./_cto_export/wallet-ledger/wallet-ledger/.env

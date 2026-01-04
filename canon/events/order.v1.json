@@ -1,0 +1,11 @@
+{
+  "name": "order.created",
+  "version": 1,
+  "schema": {
+    "orderId": "number",
+    "userId": "number",
+    "amount": "number",
+    "currency": "string",
+    "ts": "iso8601"
+  }
+}

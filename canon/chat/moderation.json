@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "modes": ["metadata_only", "user_reports", "rate_anomaly"],
+  "block_on": ["spam_burst", "harassment_reports_threshold"],
+  "reports_threshold": 3
+}

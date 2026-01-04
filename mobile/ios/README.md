@@ -1,0 +1,6 @@
+# Lumariq iOS (Native Shell)
+- Swift + WKWebView (phase 0)
+- Deep links: lumariq://...
+- Universal links: https://app.lumariq.ai/...
+
+Next: replace WKWebView routes with native screens gradually.

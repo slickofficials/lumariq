@@ -1,0 +1,6 @@
+{
+  "country": "NG",
+  "providers": ["BVN", "NIN"],
+  "fallback": "manual_review",
+  "required_for": ["wallet", "driver", "merchant"]
+}

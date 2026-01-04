@@ -1,0 +1,47 @@
+country: NG
+city: Lagos
+tier: launch
+
+features:
+  users: true
+  auth: true
+  wallet: true
+  ledger: true
+  payments: true
+  escrow: true
+
+  marketplace: true
+  food_delivery: true
+  grocery_delivery: true
+  courier: true
+
+  dispatch: true
+  ride_hailing: true
+  fleet: true
+
+  chat: true
+  notifications: true
+  referrals: true
+
+  kyc:
+    enabled: true
+    providers:
+      bvn: true
+      nin: true
+      id_card: true
+
+  ai:
+    assistants: limited
+    pricing: true
+    fraud: true
+    routing: true
+
+  health: false
+  legal: false
+  education: false
+  governance: false
+
+limits:
+  max_drivers: 5000
+  max_merchants: 2000
+  max_orders_per_day: 100000

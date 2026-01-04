@@ -1,0 +1,5 @@
+{
+  "model_registry": true,
+  "bias_checks": true,
+  "kill_switch": true
+}

@@ -1,0 +1,7 @@
+{
+  "rules": [
+    { "id": "block-sqli", "pattern": "(select|union|drop|--)", "action": "deny" },
+    { "id": "block-xss", "pattern": "<script>", "action": "deny" },
+    { "id": "block-path-traversal", "pattern": "\\.\\./", "action": "deny" }
+  ]
+}

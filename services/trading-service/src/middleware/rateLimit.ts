@@ -1,44 +1,13 @@
-import { prisma } from "../prisma";
-import { Request, Response, NextFunction } from "express";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import type { Request } from "express";
 
-export async function rateLimit(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const apiKey = (req as any).apiKey;
-  if (!apiKey) return next();
+export const neuronLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
 
-  const now = new Date();
-  const window = new Date(now);
-  window.setSeconds(0, 0);
-
-  const limit = apiKey.rateLimitRpm ?? 120;
-
-  const usage = await prisma.apiKeyUsage.upsert({
-    where: {
-      apiKeyId_window: {
-        apiKeyId: apiKey.id,
-        window
-      }
-    },
-    update: {
-      count: { increment: 1 }
-    },
-    create: {
-      apiKeyId: apiKey.id,
-      window,
-      count: 1
-    }
-  });
-
-  if (usage.count > limit) {
-    return res.status(429).json({
-      error: "Rate limit exceeded",
-      limit,
-      window
-    });
+  keyGenerator: (req: Request) => {
+    return ipKeyGenerator(req.ip);
   }
-
-  next();
-}
+});

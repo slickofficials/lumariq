@@ -1,0 +1,157 @@
+services/kyc-service/src/routes.ts:const router = Router();
+services/kyc-service/src/routes.ts:router.post("/submit", async (req, res) => {
+services/kyc-service/src/routes.ts:router.get("/status/:userId", getKycStatus);
+services/kyc-service/src/routes.ts:router.post("/approve/:userId", approveKyc);
+services/kyc-service/src/routes.ts:router.post("/reject/:userId", rejectKyc);
+services/kyc-service/src/routes.ts:export default router;
+services/legal-service/src/routes.ts:const router = Router();
+services/legal-service/src/routes.ts:router.get("/health", healthCheck);
+services/legal-service/src/routes.ts:router.post("/agreements/upload", requireAuth, upload.single("file"), uploadAgreement);
+services/legal-service/src/routes.ts:router.post("/agreements/sign", requireAuth, signAgreement);
+services/legal-service/src/routes.ts:router.get("/agreements/my", requireAuth, getUserAgreements);
+services/legal-service/src/routes.ts:router.post("/disputes/create", requireAuth, createDispute);
+services/legal-service/src/routes.ts:router.post("/disputes/attachment/:id", requireAuth, upload.single("file"), uploadAttachment);
+services/legal-service/src/routes.ts:router.get("/disputes", requireAuth, listDisputes);
+services/legal-service/src/routes.ts:export default router;
+services/orders-service/src/index.ts:import router from "./routes";
+services/orders-service/src/index.ts:app.use("/", router);
+services/orders-service/src/routes.js:const router = (0, express_1.Router)();
+services/orders-service/src/routes.js:router.post("/orders", handlers_1.createOrder);
+services/orders-service/src/routes.js:router.get("/orders/:id", handlers_1.getOrder);
+services/orders-service/src/routes.js:router.get("/orders", handlers_1.listOrders);
+services/orders-service/src/routes.js:router.patch("/orders/:id", handlers_1.updateOrderStatus);
+services/orders-service/src/routes.js:exports.default = router;
+services/orders-service/src/routes.ts:const router = Router();
+services/orders-service/src/routes.ts:router.post("/orders", createOrder);
+services/orders-service/src/routes.ts:router.get("/orders/:id", getOrder);
+services/orders-service/src/routes.ts:router.get("/orders", listOrders);
+services/orders-service/src/routes.ts:router.patch("/orders/:id", updateOrderStatus);
+services/orders-service/src/routes.ts:export default router;
+services/trading-service/src/admin/billing.ts:const router = express.Router();
+services/trading-service/src/admin/billing.ts:router.get("/billing/:key", async (req, res) => {
+services/trading-service/src/admin/billing.ts:export default router;
+services/trading-service/src/admin/dashboard.ts:const router = Router();
+services/trading-service/src/admin/dashboard.ts:router.get("/", (_req, res) => {
+services/trading-service/src/admin/dashboard.ts:export default router;
+services/trading-service/src/admin/keys.ts:const router = express.Router();
+services/trading-service/src/admin/keys.ts:router.post("/issue", async (_, res) => {
+services/trading-service/src/admin/keys.ts:export default router;
+services/trading-service/src/admin/pricing.ts:const router = express.Router();
+services/trading-service/src/admin/pricing.ts:router.get("/pricing/:country", (req, res) => {
+services/trading-service/src/admin/pricing.ts:export default router;
+services/trading-service/src/admin/revenue.ts:const router = express.Router();
+services/trading-service/src/admin/revenue.ts:router.get("/revenue", async (_, res) => {
+services/trading-service/src/admin/revenue.ts:export default router;
+services/trading-service/src/neuron/billingWebhook.ts:const router = express.Router();
+services/trading-service/src/neuron/billingWebhook.ts:router.post("/billing/webhook", async (req, res) => {
+services/trading-service/src/neuron/billingWebhook.ts:export default router;
+services/trading-service/src/neuron/index.ts:import neuronRouter from "./router";
+services/trading-service/src/neuron/jobs.ts:const router = express.Router();
+services/trading-service/src/neuron/jobs.ts:router.get("/jobs/:id", async (req, res) => {
+services/trading-service/src/neuron/jobs.ts:export default router;
+services/trading-service/src/neuron/router.ts:const router = express.Router();
+services/trading-service/src/neuron/router.ts:router.post("/execute", async (req, res) => {
+services/trading-service/src/neuron/router.ts:export default router;
+services/trading-service/src/routes/admin/migrate.ts:const router = Router();
+services/trading-service/src/routes/admin/migrate.ts:router.post("/", requireAdmin, async (req, res) => {
+services/trading-service/src/routes/admin/migrate.ts:export default router;
+services/trading-service/src/routes/admin/revenue.ts:const router = Router();
+services/trading-service/src/routes/admin/revenue.ts:router.get("/", requireAdmin, async (_req, res) => {
+services/trading-service/src/routes/admin/revenue.ts:export default router;
+services/trading-service/src/routes/admin.ts:const router = Router();
+services/trading-service/src/routes/admin.ts:router.post("/trading/disable", async (_req, res) => {
+services/trading-service/src/routes/admin.ts:router.post("/trading/enable", async (_req, res) => {
+services/trading-service/src/routes/admin.ts:router.post("/breaker/:state", async (req, res) => {
+services/trading-service/src/routes/admin.ts:export default router;
+services/trading-service/src/routes/adminBilling.ts:const router = Router();
+services/trading-service/src/routes/adminBilling.ts:router.get("/entitlements", async (_req, res) => {
+services/trading-service/src/routes/adminBilling.ts:router.post("/entitlements", async (req, res) => {
+services/trading-service/src/routes/adminBilling.ts:export default router;
+services/trading-service/src/routes/auth.ts:const router = express.Router();
+services/trading-service/src/routes/auth.ts:router.post("/register", async (req, res) => {
+services/trading-service/src/routes/auth.ts:export default router;
+services/trading-service/src/routes/billing.ts:const router = Router();
+services/trading-service/src/routes/billing.ts:router.post("/billing/add-credits", requireApiKey, async (req, res) => {
+services/trading-service/src/routes/billing.ts:router.post("/billing/mark-paid", requireApiKey, async (req, res) => {
+services/trading-service/src/routes/billing.ts:export default router;
+services/trading-service/src/routes/chat/chat.routes.ts:const router = Router();
+services/trading-service/src/routes/chat/chat.routes.ts:router.post("/send", async (req, res) => {
+services/trading-service/src/routes/chat/chat.routes.ts:router.get("/thread/:id", async (req, res) => {
+services/trading-service/src/routes/chat/chat.routes.ts:export default router;
+services/trading-service/src/routes/dispatch/dispatch.routes.ts:const router = Router();
+services/trading-service/src/routes/dispatch/dispatch.routes.ts:router.post("/request", async (req, res) => {
+services/trading-service/src/routes/dispatch/dispatch.routes.ts:router.post("/accept", async (req, res) => {
+services/trading-service/src/routes/dispatch/dispatch.routes.ts:router.post("/start", async (req, res) => {
+services/trading-service/src/routes/dispatch/dispatch.routes.ts:router.post("/complete", async (req, res) => {
+services/trading-service/src/routes/dispatch/dispatch.routes.ts:export default router;
+services/trading-service/src/routes/execute.ts:const router = Router();
+services/trading-service/src/routes/execute.ts:router.post("/", async (req, res) => {
+services/trading-service/src/routes/execute.ts:export default router;
+services/trading-service/src/routes/functions.ts:const router = Router();
+services/trading-service/src/routes/functions.ts:router.use(requireApiKey);
+services/trading-service/src/routes/functions.ts:router.get("/", async (req, res) => {
+services/trading-service/src/routes/functions.ts:export default router;
+services/trading-service/src/routes/health.ts:const router = Router();
+services/trading-service/src/routes/health.ts:router.get("/", (_req, res) => {
+services/trading-service/src/routes/health.ts:export default router;
+services/trading-service/src/routes/info.ts:const router = Router();
+services/trading-service/src/routes/info.ts:router.get("/info", requireApiKey, async (req, res) => {
+services/trading-service/src/routes/info.ts:export default router;
+services/trading-service/src/routes/keys.ts:const router = express.Router();
+services/trading-service/src/routes/keys.ts:router.post("/new", async (_, res)=>{
+services/trading-service/src/routes/keys.ts:router.post("/revoke", async (req,res)=>{
+services/trading-service/src/routes/keys.ts:export default router;
+services/trading-service/src/routes/me.ts:  const router = express.Router();
+services/trading-service/src/routes/me.ts:  router.get("/me", requireApiKey, async (req, res) => {
+services/trading-service/src/routes/me.ts:  return router;
+services/trading-service/src/routes/neuronFunctions.ts:const router = express.Router();
+services/trading-service/src/routes/neuronFunctions.ts:router.get("/functions", (req, res) => {
+services/trading-service/src/routes/neuronFunctions.ts:export default router;
+services/trading-service/src/routes/paystackWebhook.ts:const router = Router();
+services/trading-service/src/routes/paystackWebhook.ts:router.post("/paystack/webhook", async (req, res) => {
+services/trading-service/src/routes/paystackWebhook.ts:export default router;
+services/trading-service/src/routes/usage.ts:const router = Router();
+services/trading-service/src/routes/usage.ts:router.get("/", requireApiKey, async (req, res) => {
+services/trading-service/src/routes/usage.ts:export default router;
+services/trading-service/src/routes/wallet.ts:const router = Router();
+services/trading-service/src/routes/wallet.ts:router.get("/", requireApiKey, async (_req, res) => {
+services/trading-service/src/routes/wallet.ts:export default router;
+services/trading-service/src/routes/whatsapp.ts:const router = Router();
+services/trading-service/src/routes/whatsapp.ts:router.post("/incoming", async (req, res) => {
+services/trading-service/src/routes/whatsapp.ts:export default router;
+services/trading-service/src/routes.ts:const router = Router();
+services/trading-service/src/routes.ts:router.get("/orders", async (_req, res) => {
+services/trading-service/src/routes.ts:router.get("/executions", async (_req, res) => {
+services/trading-service/src/routes.ts:router.get("/pools", async (_req, res) => {
+services/trading-service/src/routes.ts:router.get("/pools/:symbol", async (req, res) => {
+services/trading-service/src/routes.ts:router.post("/pools", async (req, res) => {
+services/trading-service/src/routes.ts:router.post("/pools/:symbol/add-liquidity", async (req, res) => {
+services/trading-service/src/routes.ts:router.post("/pools/:symbol/remove-liquidity", async (req, res) => {
+services/trading-service/src/routes.ts:router.post("/pools/:symbol/deactivate", async (req, res) => {
+services/trading-service/src/routes.ts:router.post("/pools/:symbol/swap", async (req, res) => {
+services/trading-service/src/routes.ts:export default router;
+services/users-service/src/routes/auth.routes.ts:const router = Router();
+services/users-service/src/routes/auth.routes.ts:router.post("/register", authLimiter, validate(registerSchema), register);
+services/users-service/src/routes/auth.routes.ts:router.post("/login", loginLimiter, validate(loginSchema), login);
+services/users-service/src/routes/auth.routes.ts:router.post("/refresh", authLimiter, validate(refreshSchema), refreshToken);
+services/users-service/src/routes/auth.routes.ts:router.get("/health", (_req, res) => {
+services/users-service/src/routes/auth.routes.ts:export default router;
+services/users-service/src/routes.ts:const router = Router();
+services/users-service/src/routes.ts:router.post("/auth/register", register);
+services/users-service/src/routes.ts:router.post("/auth/login", login);
+services/users-service/src/routes.ts:router.post("/auth/refresh", refreshToken);
+services/users-service/src/routes.ts:export default router;
+services/wallet-service/src/providerRouter.ts:import router from "../../canon/payments/router.json";
+services/wallet-service/src/providerRouter.ts:  const providers = (router as any)[country] || [];
+services/wallet-service/src/routes/risk.routes.ts:const router = Router();
+services/wallet-service/src/routes/risk.routes.ts:router.post("/evaluate", evaluateRisk);
+services/wallet-service/src/routes/risk.routes.ts:router.get("/:userId", getRiskProfile);
+services/wallet-service/src/routes/risk.routes.ts:export default router;
+services/wallet-service/src/routes.ts:const router = Router();
+services/wallet-service/src/routes.ts:router.get("/health", (_req, res) => {
+services/wallet-service/src/routes.ts:router.post("/orders", async (req, res) => {
+services/wallet-service/src/routes.ts:export default router;
+services/wallet-service/src/routes.ts:router.get("/balances/:userId", async (req, res) => {
+services/wallet-service/src/routes.ts:router.post("/balances/credit", async (req, res) => {
+services/wallet-service/src/server.ts:import router from "./routes";
+services/wallet-service/src/server.ts:app.use("/", router);

@@ -1,276 +1,95 @@
-
 services:
-  # ─────────────────────────────
-  # Core infrastructure
-  # ─────────────────────────────
   postgres:
-    image: postgres:16-alpine
+    image: postgis/postgis:15-3.4
     container_name: lumariq-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: lumariq
       POSTGRES_PASSWORD: lumariq
-      POSTGRES_DB: lumariq_core
+      POSTGRES_DB: dispatch
+    ports:
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - lumariq-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lumariq -d lumariq_core || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U lumariq"]
+      interval: 5s
       timeout: 5s
-      retries: 5
-      start_period: 20s
-
-    # Expose only if you want external DB access from host:
-    # ports:
-    #   - "5432:5432"
-
-  redis:
-    image: redis:7-alpine
-    container_name: lumariq-redis
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redisdata:/data
-    networks:
-      - lumariq-net
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
+      retries: 10
+      start_period: 15s
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management
     container_name: lumariq-rabbitmq
     restart: unless-stopped
-    environment:
-      RABBITMQ_DEFAULT_USER: lumariq
-      RABBITMQ_DEFAULT_PASS: lumariq
     ports:
-      - "15672:15672" # Management UI
-      - "5672:5672"   # AMQP
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     networks:
       - lumariq-net
-    healthcheck:
-      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
 
-  # ─────────────────────────────
-  # Users Service
-  # ─────────────────────────────
-  users-service:
-    build:
-      context: ./services/users-service
-      dockerfile: Dockerfile
-    container_name: lumariq-users-service
-    restart: unless-stopped
-    env_file:
-      - ./services/users-service/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - lumariq-net
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:' + (process.env.PORT || 4001) + '/health', r => { if (r.statusCode !== 200) process.exit(1); }).on('error', () => process.exit(1));"
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ─────────────────────────────
-  # Orders Service
-  # ─────────────────────────────
-  orders-service:
-    build:
-      context: ./services/orders-service
-    container_name: lumariq-orders-service
-    restart: unless-stopped
-    env_file:
-      - ./services/orders-service/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - lumariq-net
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:' + (process.env.PORT || 4002) + '/health', r => { if (r.statusCode !== 200) process.exit(1); }).on('error', () => process.exit(1));"
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ─────────────────────────────
-  # KYC Service
-  # ─────────────────────────────
-  kyc-service:
-    build:
-      context: ./services/kyc-service
-    container_name: lumariq-kyc-service
-    restart: unless-stopped
-    env_file:
-      - ./services/kyc-service/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - lumariq-net
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:' + (process.env.PORT || 4003) + '/health', r => { if (r.statusCode !== 200) process.exit(1); }).on('error', () => process.exit(1));"
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ─────────────────────────────
-  # Legal Service
-  # ─────────────────────────────
-  legal-service:
-    build:
-      context: ./services/legal-service
-    container_name: lumariq-legal-service
-    restart: unless-stopped
-    env_file:
-      - ./services/legal-service/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - lumariq-net
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:' + (process.env.PORT || 4004) + '/health', r => { if (r.statusCode !== 200) process.exit(1); }).on('error', () => process.exit(1));"
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ─────────────────────────────
-  # Dispatch Service (Go + gRPC)
-  # ─────────────────────────────
   dispatch-service:
     build:
       context: ./services/dispatch-service
     container_name: lumariq-dispatch-service
-    restart: unless-stopped
-    env_file:
-      - ./services/dispatch-service/.env
     depends_on:
-      redis:
-        condition: service_healthy
-      users-service:
-        condition: service_healthy
-      orders-service:
-        condition: service_healthy
-    networks:
-      - lumariq-net
-    # Expose only inside the cluster (no host ports)
-    # If you want external debug:
-    # ports:
-    #   - "5001:5001"   # HTTP
-    #   - "50051:50051" # gRPC
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:${PORT:-5001}/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ─────────────────────────────
-  # Wallet Ledger (Rust)
-  # ─────────────────────────────
-  wallet-ledger:
-    build:
-      context: ./services/wallet-ledger
-    container_name: lumariq-wallet-ledger
-    restart: unless-stopped
-    env_file:
-      - ./services/wallet-ledger/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - lumariq-net
-    # ports:
-    #   - "5002:5002"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:${PORT:-5002}/health || exit 1"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
-  # ─────────────────────────────
-  # API Gateway
-  # ─────────────────────────────
-  api-gateway:
-    build:
-      context: ./api-gateway
-    container_name: lumariq-api-gateway
-    restart: unless-stopped
-    env_file:
-      - ./api-gateway/.env
-    depends_on:
-      users-service:
-        condition: service_healthy
-      orders-service:
-        condition: service_healthy
-      kyc-service:
-        condition: service_healthy
-      legal-service:
-        condition: service_healthy
-      dispatch-service:
-        condition: service_healthy
-      wallet-ledger:
-        condition: service_healthy
-    networks:
-      - lumariq-net
+      - postgres
+      - rabbitmq
+    environment:
+      PORT: 4015
+      DATABASE_URL: "postgres://lumariq:lumariq@postgres:5432/dispatch?sslmode=disable"
     ports:
-      - "8080:8080"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:${PORT:-8080}/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+      - "4015:4015"
+    networks:
+      - lumariq-net
 
-volumes:
-  pgdata:
-  redisdata:
+  # =========================
+  # 🧠 ML TRUST ENGINE
+  # =========================
+  ml-trust:
+    build: ./services/ml-trust
+    container_name: lumariq-ml-trust
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - lumariq-net
+
+  # =========================
+  # 🛡 ANTI-FRAUD ENGINE
+  # =========================
+  anti-fraud:
+    build: ./services/anti-fraud
+    container_name: lumariq-anti-fraud
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+    networks:
+      - lumariq-net
+
+  # =========================
+  # ⚡ SURGE ENGINE (WORKER)
+  # =========================
+  surge-engine:
+    build: ./services/surge-engine
+    container_name: lumariq-surge-engine
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgres://lumariq:lumariq@postgres:5432/dispatch?sslmode=disable"
+    networks:
+      - lumariq-net
 
 networks:
   lumariq-net:
     driver: bridge
+
+volumes:
+  pgdata:

@@ -1,0 +1,5 @@
+{
+  "android": "Kotlin",
+  "ios": "Swift",
+  "shared": "API + contracts only"
+}

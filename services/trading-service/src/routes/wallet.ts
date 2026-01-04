@@ -1,29 +1,21 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
-import { requireApiKey } from "../middleware/apiKey";
+import { requireApiKey } from "../middleware/requireApiKey";
+import { getCredits, getUsage, getPaidUntil } from "../analytics/redis";
 
-export const walletRouter = Router();
+const router = Router();
 
-walletRouter.post("/deposit", requireApiKey, async (req, res) => {
-  const { amount } = req.body;
-  const userId = (req as any).userId;
+router.get("/", requireApiKey, async (_req, res) => {
+  const key: string = res.locals.apiKey;
 
-  const wallet = await prisma.wallet.update({
-    where: { userId },
-    data: { balance: { increment: amount } }
+  const credits = await getCredits(key);
+  const usage = await getUsage(key);
+  const paidUntil = await getPaidUntil(key);
+
+  res.json({
+    credits,
+    usage_today: usage,
+    paid_until: paidUntil,
   });
-
-  res.json(wallet);
 });
 
-walletRouter.post("/withdraw", requireApiKey, async (req, res) => {
-  const { amount } = req.body;
-  const userId = (req as any).userId;
-
-  const wallet = await prisma.wallet.update({
-    where: { userId },
-    data: { balance: { decrement: amount } }
-  });
-
-  res.json(wallet);
-});
+export default router;

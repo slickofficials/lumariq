@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package dispatch.v1;
+
+option go_package = "github.com/lumariq/dispatch-service/gen;gen";
+
+message CreateRideRequest {
+    string passenger_id = 1;
+    double pickup_lat = 2;
+    double pickup_lng = 3;
+    double dropoff_lat = 4;
+    double dropoff_lng = 5;
+}
+
+message CreateRideResponse {
+    string ride_id = 1;
+    string status = 2;
+}
+
+service DispatchService {
+    rpc CreateRide(CreateRideRequest) returns (CreateRideResponse);
+}

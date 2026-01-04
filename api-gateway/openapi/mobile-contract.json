@@ -1,0 +1,55 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Lumariq Mobile Contract", "version": "1.0.0" },
+  "servers": [{ "url": "https://api.lumariq.com" }],
+  "paths": {
+    "/healthz": {
+      "get": { "responses": { "200": { "description": "ok" } } }
+    },
+    "/api/dispatch/request-ride": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RideRequest" } } } },
+        "responses": { "202": { "description": "queued" } }
+      }
+    },
+    "/api/dispatch/complete-ride": {
+      "post": {
+        "parameters": [
+          { "name": "rideId", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "driverId", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "completed" } }
+      }
+    },
+    "/api/orders": {
+      "post": {
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrderCreate" } } } },
+        "responses": { "200": { "description": "created" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RideRequest": {
+        "type": "object",
+        "required": ["passengerId","pickupLat","pickupLng","dropoffLat","dropoffLng"],
+        "properties": {
+          "passengerId": { "type": "string" },
+          "pickupLat": { "type": "number" },
+          "pickupLng": { "type": "number" },
+          "dropoffLat": { "type": "number" },
+          "dropoffLng": { "type": "number" }
+        }
+      },
+      "OrderCreate": {
+        "type": "object",
+        "required": ["userId","amount"],
+        "properties": {
+          "userId": { "type": "number" },
+          "amount": { "type": "number" },
+          "currency": { "type": "string", "default": "NGN" }
+        }
+      }
+    }
+  }
+}

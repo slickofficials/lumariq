@@ -1,0 +1,5 @@
+{
+  "backups": "daily",
+  "dr": "multi-region",
+  "residency": "country-pack"
+}

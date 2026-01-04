@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TradeOrder {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  symbol    String
+  side      String
+  quantity  Float
+  price     Float
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+
+  buyExecutions  TradeExecution[] @relation("BuyOrder")
+  sellExecutions TradeExecution[] @relation("SellOrder")
+}
+
+model TradeExecution {
+  id          Int      @id @default(autoincrement())
+  buyOrderId  Int
+  sellOrderId Int
+  price       Float
+  quantity    Float
+  createdAt   DateTime @default(now())
+
+  buyOrder  TradeOrder @relation("BuyOrder", fields: [buyOrderId], references: [id])
+  sellOrder TradeOrder @relation("SellOrder", fields: [sellOrderId], references: [id])
+}
+
+model LiquidityPool {
+  id           Int      @id @default(autoincrement())
+  symbol       String   @unique
+  baseReserve  Float
+  quoteReserve Float
+  totalShares  Float    @default(0)
+  feeBps       Int      @default(30)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  providers LiquidityProvider[]
+}
+
+model LiquidityProvider {
+  id        Int      @id @default(autoincrement())
+  poolId    Int
+  userId    Int
+  shares    Float
+  createdAt DateTime @default(now())
+
+  pool LiquidityPool @relation(fields: [poolId], references: [id])
+}
+
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+
+model BillingEntitlement {
+  id        String   @id @default(cuid())
+  apiKey    String   @unique
+  plan      Plan     @default(FREE)
+  provider  String?
+  status    String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([plan])
+}

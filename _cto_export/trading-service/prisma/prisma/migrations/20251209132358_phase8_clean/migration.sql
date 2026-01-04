@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "LiquidityPool" ADD COLUMN     "active" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "totalShares" DOUBLE PRECISION NOT NULL DEFAULT 0;

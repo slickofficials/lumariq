@@ -1,0 +1,115 @@
+        "id":           driver.ID,
+        "name":         driver.Name,
+        "brand":        driver.Brand,
+        "model":        driver.Model,
+        "color":        driver.Color,
+        "year":         driver.Year,
+        "rating":       driver.Rating,
+        "vehiclePlate": driver.VehiclePlate,
+        "lat":          driver.Lat,
+        "lng":          driver.Lng,
+    },
+    "distanceKm":    distanceKm,
+    "price":         finalPrice,
+    "currency":      "NGN",
+    "maxPriceUsed":  req.MaxPrice > 0,
+    "requestedMax":  req.MaxPrice,
+    "pricingEngine": "lumariq-smart-bid-v1",
+})
+})
+	// ✅ Complete ride
+	router.POST("/dispatch/api/ride/complete", func(c *gin.Context) {
+		var req struct {
+			RideID   string `json:"rideId"`
+			DriverID string `json:"driverId"`
+		}
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if req.RideID == "" || req.DriverID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "rideId and driverId are required"})
+			return
+		}
+
+		ctx := context.Background()
+
+		if err := rideRepo.CompleteRide(ctx, req.RideID, req.DriverID); err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		_ = driverRepo.SetAvailable(ctx, req.DriverID, true)
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":   "completed",
+			"rideId":   req.RideID,
+			"driverId": req.DriverID,
+		})
+	})
+
+// ⭐ Passenger rates driver after trip
+	router.POST("/dispatch/api/ride/rate", func(c *gin.Context) {
+	var req struct {
+		RideID   string  `json:"rideId"`
+		DriverID string  `json:"driverId"`
+		Rating   float64 `json:"rating"`
+	}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if req.RideID == "" || req.DriverID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "rideId and driverId are required"})
+		return
+	}
+	if req.Rating <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "rating must be > 0"})
+		return
+	}
+
+	ctx := context.Background()
+
+	// 🌟 God-mode rating update
+driver, err := driverRepo.UpdateRating(ctx, req.DriverID, req.Rating)
+if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+    return
+}
+
+// 🔥 Return updated full driver profile
+driver, _ = driverRepo.GetDriverByID(ctx, req.DriverID)
+
+c.JSON(http.StatusOK, gin.H{
+    "status":   "rated",
+    "rideId":   req.RideID,
+    "driverId": req.DriverID,
+    "rating":   req.Rating,
+    "driver":   driver,
+})
+})
+ }
+// Simple Haversine distance in KM
+func haversineKm(lat1, lng1, lat2, lng2 float64) float64 {
+	const R = 6371.0 // Earth radius in KM
+
+	rad := func(deg float64) float64 {
+		return deg * math.Pi / 180.0
+	}
+
+	dLat := rad(lat2 - lat1)
+	dLng := rad(lng2 - lng1)
+
+	lat1Rad := rad(lat1)
+	lat2Rad := rad(lat2)
+
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
+		math.Cos(lat1Rad)*math.Cos(lat2Rad)*
+			math.Sin(dLng/2)*math.Sin(dLng/2)
+
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+
+	return R * c
+}

@@ -1,0 +1,515 @@
+===== REPO STRUCTURE (dispatch-service) =====
+services/dispatch-service
+services/dispatch-service/cmd
+services/dispatch-service/cmd/dispatch
+services/dispatch-service/internal
+services/dispatch-service/internal/config
+services/dispatch-service/internal/dispatch
+services/dispatch-service/internal/pricing
+services/dispatch-service/internal/routes
+services/dispatch-service/internal/storage
+services/dispatch-service/internal/ws
+services/dispatch-service/migrations
+services/dispatch-service/proto
+
+services/dispatch-service/.env
+services/dispatch-service/cmd/dispatch/main.go
+services/dispatch-service/CTO_LOCK_RATING_SNAPSHOT.txt
+services/dispatch-service/dispatch-service
+services/dispatch-service/Dockerfile
+services/dispatch-service/go.mod
+services/dispatch-service/go.sum
+services/dispatch-service/internal/config/config.go
+services/dispatch-service/internal/dispatch/selector.go
+services/dispatch-service/internal/pricing/pricing.go
+services/dispatch-service/internal/pricing/surge.go
+services/dispatch-service/internal/routes/routes.go
+services/dispatch-service/internal/storage/db.go
+services/dispatch-service/internal/storage/drivers.go
+services/dispatch-service/internal/storage/migrate.go
+services/dispatch-service/internal/storage/rides.go
+services/dispatch-service/internal/ws/hub.go
+services/dispatch-service/lumariq_core_cto_takeover.tar.gz
+services/dispatch-service/migrations/001_create_rides.sql
+services/dispatch-service/migrations/002_create_drivers.sql
+services/dispatch-service/migrations/003_create_revenue.sql
+services/dispatch-service/proto/dispatch.proto
+services/dispatch-service/README.md
+
+===== RIDE RATING HANDLERS =====
+services/dispatch-service/internal/routes/routes.go:302:	router.POST("/dispatch/api/ride/rate", func(c *gin.Context) {
+
+===== RIDE STORAGE =====
+package storage
+
+import (
+	"context"
+	"errors"
+	"time"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type RideStatus string
+
+const (
+	RideStatusQueued    RideStatus = "queued"
+	RideStatusAssigned  RideStatus = "assigned"
+	RideStatusCompleted RideStatus = "completed"
+)
+
+type Ride struct {
+	ID          string     `json:"rideId"`
+	PassengerID string     `json:"passengerId"`
+	DriverID    string     `json:"driverId,omitempty"`
+	PickupLat   float64    `json:"pickupLat"`
+	PickupLng   float64    `json:"pickupLng"`
+	DropoffLat  float64    `json:"dropoffLat"`
+	DropoffLng  float64    `json:"dropoffLng"`
+	DistanceKm  float64    `json:"distanceKm"`
+	Fare        float64    `json:"fare"`
+	Status      RideStatus `json:"status"`
+	RequestedAt time.Time   `json:"requestedAt"`
+}
+
+type RideRepository interface {
+	CreateRide(ctx context.Context, ride *Ride) error
+	AssignDriver(ctx context.Context, rideID, driverID string) error
+	CompleteRide(ctx context.Context, rideID, driverID string) error
+	GetRideByID(ctx context.Context, rideID string) (*Ride, error)
+
+	// Smart-Bid 👇
+	CreateRideWithPricing(ctx context.Context, ride *Ride, driverID string) error
+}
+
+type PostgresRideRepository struct {
+	pool *pgxpool.Pool
+}
+
+func NewPostgresRideRepository(pool *pgxpool.Pool) *PostgresRideRepository {
+	return &PostgresRideRepository{pool: pool}
+}
+
+var (
+	ErrRideNotFound = errors.New("ride_not_found")
+)
+
+func (r *PostgresRideRepository) CreateRide(ctx context.Context, ride *Ride) error {
+	ride.ID = uuid.NewString()
+	ride.Status = RideStatusQueued
+
+	return r.pool.QueryRow(ctx, `
+        INSERT INTO rides (
+            id, passenger_id,
+            pickup_lat, pickup_lng,
+            dropoff_lat, dropoff_lng,
+            status
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7)
+        RETURNING requested_at
+    `,
+		ride.ID,
+		ride.PassengerID,
+		ride.PickupLat, ride.PickupLng,
+		ride.DropoffLat, ride.DropoffLng,
+		ride.Status,
+	).Scan(&ride.RequestedAt)
+}
+func (r *PostgresRideRepository) CreateRideWithPricing(ctx context.Context, ride *Ride, driverID string) error {
+	ride.ID = uuid.NewString()
+	ride.Status = RideStatusAssigned
+
+	return r.pool.QueryRow(ctx, `
+        INSERT INTO rides (
+            id, passenger_id, driver_id,
+            pickup_lat, pickup_lng,
+            dropoff_lat, dropoff_lng,
+            distance_km, fare,
+            status
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+        RETURNING requested_at
+    `,
+		ride.ID,
+		ride.PassengerID,
+		driverID,
+		ride.PickupLat, ride.PickupLng,
+		ride.DropoffLat, ride.DropoffLng,
+		ride.DistanceKm,
+		ride.Fare,
+		ride.Status,
+	).Scan(&ride.RequestedAt)
+}
+
+func (r *PostgresRideRepository) AssignDriver(ctx context.Context, rideID, driverID string) error {
+	cmdTag, err := r.pool.Exec(ctx, `
+		UPDATE rides
+		SET driver_id = $1,
+		    status = $2
+		WHERE id = $3
+	`,
+		driverID, RideStatusAssigned, rideID,
+	)
+
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return ErrRideNotFound
+	}
+	return nil
+}
+
+func (r *PostgresRideRepository) CompleteRide(ctx context.Context, rideID, driverID string) error {
+    tx, err := r.pool.Begin(ctx)
+    if err != nil {
+        return err
+    }
+    defer tx.Rollback(ctx)
+
+    // 1️⃣ Fetch fare for revenue + payout
+    var fare float64
+    err = tx.QueryRow(ctx, `
+        SELECT fare FROM rides WHERE id=$1
+    `, rideID).Scan(&fare)
+    if err != nil {
+        return err
+    }
+
+    // 2️⃣ Update ride record
+    _, err = tx.Exec(ctx, `
+        UPDATE rides
+        SET status = $1,
+            driver_id = $2,
+            trip_end_at = NOW(),
+            updated_at = NOW()
+        WHERE id = $3
+    `, RideStatusCompleted, driverID, rideID)
+    if err != nil {
+        return err
+    }
+
+   // 3 Pay driver 85% + boost rating slightly
+_, err = tx.Exec(ctx, `
+    UPDATE drivers
+    SET wallet_balance = wallet_balance + $1,
+        total_rides = total_rides + 1,
+        updated_at = NOW()
+    WHERE id = $2
+`, fare*0.85, driverID)
+    if err != nil {
+        return err
+    }
+
+    // 4️⃣ Insert Lumariq revenue log 15%
+    _, err = tx.Exec(ctx, `
+        INSERT INTO lumariq_revenue (ride_id, driver_id, revenue_amount)
+        VALUES ($1, $2, $3)
+    `, rideID, driverID, fare*0.15)
+    if err != nil {
+        return err
+    }
+
+    return tx.Commit(ctx)
+}
+
+func (r *PostgresRideRepository) GetRideByID(ctx context.Context, rideID string) (*Ride, error) {
+	ride := &Ride{}
+
+	err := r.pool.QueryRow(ctx, `
+		SELECT
+			id,
+			passenger_id,
+			driver_id,
+			pickup_lat,
+			pickup_lng,
+			dropoff_lat,
+			dropoff_lng,
+			status,
+			requested_at
+		FROM rides
+		WHERE id = $1
+	`,
+		rideID,
+	).Scan(
+		&ride.ID,
+		&ride.PassengerID,
+		&ride.DriverID,
+		&ride.PickupLat,
+		&ride.PickupLng,
+		&ride.DropoffLat,
+		&ride.DropoffLng,
+		&ride.Status,
+
+===== DRIVER STORAGE =====
+package storage
+
+import (
+	"context"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type Driver struct {
+	ID            string    `json:"id"`
+	Name          string    `json:"name"`
+	VehicleType   string    `json:"vehicleType"`
+	VehiclePlate  string    `json:"vehiclePlate"`
+	Lat           float64   `json:"lat"`
+	Lng           float64   `json:"lng"`
+	Available     bool      `json:"available"`
+	WalletBalance float64   `json:"walletBalance"`
+	TotalRides    int       `json:"totalRides"`
+	UpdatedAt     time.Time `json:"updatedAt"`
+
+	Brand  string  `json:"brand"`
+	Model  string  `json:"model"`
+	Color  string  `json:"color"`
+	Year   int     `json:"year"`
+	Rating float64 `json:"rating"`
+
+	// 🧠 Reputation system
+	RatingCount int    `json:"ratingCount"`
+	Tier        string `json:"tier"`
+	Level       int    `json:"level"`
+
+	AvatarURL string `json:"avatarUrl"`
+}
+type DriverRepository interface {
+	RegisterDriver(ctx context.Context, d *Driver) error
+	UpdateLocation(ctx context.Context, id string, lat, lng float64) error
+	SetAvailable(ctx context.Context, id string, available bool) error
+	FindNearest(ctx context.Context, lat, lng float64) (*Driver, error)
+
+	// Live profile / tracking
+	GetDriverByID(ctx context.Context, id string) (*Driver, error)
+
+	// Passenger rating — Smart reputation engine
+UpdateRating(ctx context.Context, id string, rating float64) (*Driver, error)
+}
+
+type PostgresDriverRepository struct {
+	pool *pgxpool.Pool
+}
+
+func NewPostgresDriverRepository(pool *pgxpool.Pool) *PostgresDriverRepository {
+	return &PostgresDriverRepository{pool: pool}
+}
+
+func (r *PostgresDriverRepository) RegisterDriver(ctx context.Context, d *Driver) error {
+	if d.Available == false {
+		// by default, new drivers are available unless explicitly false
+		d.Available = true
+	}
+
+	_, err := r.pool.Exec(ctx, `
+    INSERT INTO drivers (
+        id, name, vehicle_type, vehicle_plate,
+        lat, lng, available,
+        brand, model, color, year,
+        rating, tier, level,
+        avatar_url,
+        updated_at
+    )
+    VALUES ($1,$2,$3,$4,$5,$6,$7,
+            $8,$9,$10,$11,
+            $12,$13,$14,
+            $15,
+            NOW())
+    ON CONFLICT (id) DO UPDATE SET
+        name=$2,
+        vehicle_type=$3,
+        vehicle_plate=$4,
+        lat=$5,
+        lng=$6,
+        available=$7,
+        brand=$8,
+        model=$9,
+        color=$10,
+        year=$11,
+        rating=$12,
+        tier=$13,
+        level=$14,
+        avatar_url=$15,
+        updated_at=NOW()
+`,
+    d.ID, d.Name, d.VehicleType, d.VehiclePlate,
+    d.Lat, d.Lng, d.Available,
+    d.Brand, d.Model, d.Color, d.Year,
+    d.Rating, d.Tier, d.Level,
+    d.AvatarURL,
+)
+return err
+}
+
+func (r *PostgresDriverRepository) UpdateLocation(ctx context.Context, id string, lat, lng float64) error {
+	_, err := r.pool.Exec(ctx, `
+		UPDATE drivers SET lat=$1, lng=$2, updated_at=NOW()
+		WHERE id=$3
+	`, lat, lng, id)
+	return err
+}
+
+func (r *PostgresDriverRepository) SetAvailable(ctx context.Context, id string, available bool) error {
+	_, err := r.pool.Exec(ctx, `
+		UPDATE drivers SET available=$1, updated_at=NOW()
+		WHERE id=$2
+	`, available, id)
+	return err
+}
+
+func (r *PostgresDriverRepository) UpdateRating(
+	ctx context.Context,
+	driverID string,
+	newRating float64,
+) (*Driver, error) {
+
+	// 🔒 Clamp rating to [1,5]
+	if newRating < 1 {
+		newRating = 1
+	}
+	if newRating > 5 {
+		newRating = 5
+	}
+
+	row := r.pool.QueryRow(ctx, `
+		UPDATE drivers
+		SET
+			rating_sum   = rating_sum + $2,
+			rating_count = rating_count + 1,
+			rating = LEAST(5.0, GREATEST(1.0,
+				(rating_sum + $2) / (rating_count + 1)
+			)),
+			tier = CASE
+				WHEN rating_count + 1 >= 500 AND (rating_sum + $2) / (rating_count + 1) >= 4.9 THEN 'Diamond'
+				WHEN rating_count + 1 >= 200 AND (rating_sum + $2) / (rating_count + 1) >= 4.8 THEN 'Platinum'
+				WHEN rating_count + 1 >= 50  AND (rating_sum + $2) / (rating_count + 1) >= 4.5 THEN 'Gold'
+				WHEN rating_count + 1 >= 20  AND (rating_sum + $2) / (rating_count + 1) >= 4.2 THEN 'Silver'
+				ELSE 'Bronze'
+			END,
+			level = CASE
+				WHEN rating_count + 1 >= 500 THEN 5
+				WHEN rating_count + 1 >= 200 THEN 4
+				WHEN rating_count + 1 >= 50  THEN 3
+				WHEN rating_count + 1 >= 20  THEN 2
+				ELSE 1
+			END,
+			updated_at = NOW()
+		WHERE id = $1
+		RETURNING
+			id,
+			name,
+			vehicle_type,
+			vehicle_plate,
+			lat,
+			lng,
+			available,
+			wallet_balance,
+			total_rides,
+			updated_at,
+			brand,
+			model,
+			color,
+			year,
+			rating,
+			rating_count,
+			tier,
+			level,
+			avatar_url;
+	`, driverID, newRating)
+
+	var d Driver
+	if err := row.Scan(
+		&d.ID,
+		&d.Name,
+		&d.VehicleType,
+		&d.VehiclePlate,
+		&d.Lat,
+		&d.Lng,
+		&d.Available,
+		&d.WalletBalance,
+		&d.TotalRides,
+		&d.UpdatedAt,
+		&d.Brand,
+		&d.Model,
+		&d.Color,
+		&d.Year,
+		&d.Rating,
+		&d.RatingCount,
+		&d.Tier,
+		&d.Level,
+		&d.AvatarURL,
+	); err != nil {
+		return nil, err
+
+===== SQL TRANSACTIONS =====
+Binary file services/dispatch-service/dispatch-service matches
+
+===== RATED LOGIC =====
+Binary file services/dispatch-service/dispatch-service matches
+services/dispatch-service/internal/routes/routes.go:335:    "status":   "rated",
+
+===== HTTP HANDLERS =====
+services/dispatch-service/internal/dispatch/selector.go:1:func ScoreDriver(distanceKm, acceptanceRate, rating, experience float64) float64 {
+services/dispatch-service/internal/dispatch/selector.go:3:	       (acceptanceRate * 0.30) + 
+
+===== DOCKER / ENV =====
+version: "3.9"
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: lumariq-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lumariq
+      POSTGRES_PASSWORD: lumariq
+      POSTGRES_DB: dispatch
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lumariq-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lumariq"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: lumariq-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - lumariq-net
+
+  dispatch-service:
+    build:
+      context: ./services/dispatch-service
+    container_name: lumariq-dispatch-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      PORT: 4015
+      DATABASE_URL: "postgres://lumariq:lumariq@postgres:5432/dispatch?sslmode=disable"
+    ports:
+      - "4015:4015"
+    networks:
+      - lumariq-net
+
+networks:
+  lumariq-net:
+    driver: bridge
+
+volumes:
+  pgdata:

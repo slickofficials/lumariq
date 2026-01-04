@@ -1,0 +1,6 @@
+{
+  "country": "NG",
+  "requires": ["BVN", "NIN"],
+  "kyb": ["CAC"],
+  "fallback": "manual-review"
+}

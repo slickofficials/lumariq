@@ -1,0 +1,5 @@
+{
+  "versioning": "v1",
+  "backward_compatible": true,
+  "breaking_changes": "new_version_only"
+}

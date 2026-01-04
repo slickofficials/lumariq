@@ -1,0 +1,6 @@
+{
+  "logs": true,
+  "traces": true,
+  "metrics": ["latency","errors","queue_depth"],
+  "slo": "99.9%"
+}

@@ -56,3 +56,23 @@ model LiquidityProvider {
 
   pool LiquidityPool @relation(fields: [poolId], references: [id])
 }
+
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+
+model BillingEntitlement {
+  id        String   @id @default(cuid())
+  apiKey    String   @unique
+  plan      Plan     @default(FREE)
+  provider  String?
+  status    String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([plan])
+}

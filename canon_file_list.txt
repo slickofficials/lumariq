@@ -1,0 +1,6 @@
+_canon/EXTERNAL_FUNCTIONS.txt
+_canon/FUNCTIONS_MASTER.md
+_canon/functions_seed.txt
+_canon/GAPS_BACKLOG.md
+_canon/LUMARIQ_500_PLUS.txt
+_canon/LUMARIQ_CANON.md

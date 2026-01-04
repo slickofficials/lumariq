@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../prisma";
-import { requireApiKey } from "../middleware/apiKey";
+import { requireApiKey } from "../middleware/requireApiKey";
 
 export const tradingRouter = Router();
 

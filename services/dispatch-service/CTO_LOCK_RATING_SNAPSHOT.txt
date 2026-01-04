@@ -1,0 +1,13 @@
+===== REPO TREE (dispatch-service) =====
+
+===== RIDE RATING HANDLERS =====
+
+===== RIDE STORAGE =====
+
+===== DRIVER STORAGE =====
+
+===== SQL TRANSACTIONS =====
+
+===== RATED LOGIC =====
+
+===== DOCKER / ENV =====

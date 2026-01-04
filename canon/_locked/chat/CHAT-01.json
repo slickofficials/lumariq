@@ -1,0 +1,9 @@
+{
+  "features": [
+    "user_to_driver",
+    "user_to_merchant",
+    "group_chat",
+    "read_receipts"
+  ],
+  "storage": "encrypted_at_rest"
+}

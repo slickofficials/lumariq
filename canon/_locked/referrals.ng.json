@@ -1,0 +1,21 @@
+{
+  "country": "NG",
+  "currency": "NGN",
+  "rules": {
+    "user_invite_reward_minor": 50000,
+    "referee_first_completed_order_reward_minor": 25000,
+    "referee_first_completed_ride_reward_minor": 25000,
+    "min_order_amount_minor": 100000,
+    "max_rewards_per_referrer_per_day": 20,
+    "cooldown_hours_per_referee": 24
+  },
+  "eligibility": {
+    "require_kyc_for_cashout": true,
+    "require_phone_verified": true,
+    "require_device_trust_score_min": 0.3
+  },
+  "idempotency": {
+    "key_prefix": "referral:",
+    "strategy": "append-only"
+  }
+}

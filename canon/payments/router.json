@@ -1,0 +1,6 @@
+{
+  "NG": ["paystack", "flutterwave"],
+  "GH": ["paystack", "hubtel"],
+  "BJ": ["flutterwave"],
+  "fallback": "manual"
+}

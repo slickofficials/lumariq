@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lumariq Neuron Grid | L5 Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white font-sans p-8">
+    <header class="flex justify-between items-center mb-12">
+        <h1 class="text-4xl font-black tracking-tighter text-cyan-400 italic">LUMARIQ NEURON GRID</h1>
+        <div id="connection-status" class="px-4 py-1 bg-green-500/20 text-green-400 rounded-full text-[10px] font-bold border border-green-500/50 uppercase tracking-widest">System Live</div>
+    </header>
+
+    <div id="grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"></div>
+
+    <div class="bg-black/50 border border-slate-700 rounded-xl p-6 relative">
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Live Pulse Log</h2>
+        <div id="log" class="font-mono text-[10px] space-y-2 h-40 overflow-y-auto"></div>
+        <div id="toast" class="hidden absolute top-4 right-6 bg-cyan-500 text-black text-[10px] font-black px-3 py-1 rounded shadow-lg animate-bounce">COMMAND SENT</div>
+    </div>
+
+    <script>
+        const container = document.getElementById('grid-container');
+        const log = document.getElementById('log');
+        const toast = document.getElementById('toast');
+
+        async function toggleLock(regionId, status) {
+            toast.classList.remove('hidden');
+            try {
+                const res = await fetch("/admin/force-toggle", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ regionId, lockStatus: status, reason: "ADMIN_FORCE_COMMAND" })
+                });
+                if (res.ok) setTimeout(() => toast.classList.add('hidden'), 2000);
+            } catch (err) {
+                console.error("Overlord Error:", err);
+            }
+        }
+
+        function updateCard(region) {
+            let card = document.getElementById(`card-${region.region_id}`);
+            if (!card) {
+                card = document.createElement('div');
+                card.id = `card-${region.region_id}`;
+                container.appendChild(card);
+            }
+
+            const isLocked = region.locked;
+            card.className = `${isLocked ? 'bg-red-900/40 border-red-500' : 'bg-emerald-900/40 border-emerald-500'} border-2 rounded-2xl p-6 transition-all duration-500 shadow-2xl relative`;
+            
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-2xl font-black">${region.region_id}</h3>
+                    <div class="h-3 w-3 rounded-full ${isLocked ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}"></div>
+                </div>
+                <div class="text-3xl font-black mb-1">${isLocked ? 'LOCKED' : 'ACTIVE'}</div>
+                <div class="text-[9px] uppercase font-bold text-white/40 mb-4 h-8">${region.reason || 'Node Active'}</div>
+                
+                <div class="flex gap-2 mb-4">
+                    <button onclick="toggleLock('${region.region_id}', true)" class="flex-1 bg-red-600 hover:bg-red-500 text-[9px] font-bold py-1 rounded transition border-b-2 border-red-800">FORCE LOCK</button>
+                    <button onclick="toggleLock('${region.region_id}', false)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-[9px] font-bold py-1 rounded transition border-b-2 border-emerald-800">FORCE UNLOCK</button>
+                </div>
+
+                <div class="pt-2 border-t border-white/10 flex justify-between text-[8px] font-mono opacity-50">
+                    <span>${region.multiplier_threshold}x LIMIT</span>
+                    <span>${new Date(region.updated_at).toLocaleTimeString()}</span>
+                </div>
+            `;
+        }
+
+        async function init() {
+            const res = await fetch('/admin/grid-status');
+            const data = await res.json();
+            data.forEach(updateCard);
+        }
+
+        const evtSource = new EventSource("/events");
+        evtSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const entry = document.createElement('div');
+            entry.className = "border-l-2 border-cyan-500 pl-3 py-1 bg-cyan-500/5 text-cyan-200";
+            entry.innerHTML = `<span class="text-slate-600">[${new Date().toLocaleTimeString()}]</span> ${data.type}: ${data.payload.regionId} status updated.`;
+            log.prepend(entry);
+            init();
+        };
+
+        init();
+    </script>
+</body>
+</html>

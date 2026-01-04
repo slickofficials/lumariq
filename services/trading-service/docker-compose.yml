@@ -1,0 +1,25 @@
+
+
+services:
+  lumariq-redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  neuron-grid:
+    build: .
+    command: ["node","dist/index.js"]
+    environment:
+      REDIS_HOST: lumariq-redis
+      PORT: 4010
+    ports:
+      - "4010:4010"
+    depends_on:
+      - lumariq-redis
+
+  neuron-worker:
+    build: .
+    environment:
+      REDIS_HOST: lumariq-redis
+    depends_on:
+      - lumariq-redis

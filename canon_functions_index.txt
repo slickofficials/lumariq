@@ -1,0 +1,2 @@
+_canon/FUNCTIONS_MASTER.md:Total: **600** functions
+_canon/LUMARIQ_CANON.md:- Append-only functions list (deprecate, don’t delete)

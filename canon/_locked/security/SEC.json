@@ -1,0 +1,5 @@
+{
+  "waf": true,
+  "rate_limits": "per_api_key",
+  "secrets": "env_only"
+}

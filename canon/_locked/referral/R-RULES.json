@@ -1,0 +1,5 @@
+{
+  "tiers": [1,5,10],
+  "daily_cap": 3,
+  "anti_abuse": ["device_fingerprint", "idempotency"]
+}

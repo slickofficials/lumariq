@@ -75,9 +75,7 @@ router.post("/pools/:symbol/add-liquidity", async (req, res) => {
       symbol,
       userId,
       Number(amountBase),
-      Number(amountQuote),
-      maxSlippageBps != null ? Number(maxSlippageBps) : 100
-    );
+      Number(amountQuote));
 
     return res.json(result);
   } catch (err: any) {

@@ -1,23 +1,16 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 
-export function errorHandler(
-  err: any,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) {
-  const status = err.status || 500;
+export function errorHandler(err: any, req: Request, res: Response, _next: NextFunction) {
+  const rid = (req as any).requestId || "";
+  const code = Number(err?.statusCode || err?.status || 500);
 
-  const payload = {
-    error: err.message || "Internal Server Error",
-    status,
-    requestId: (req as any).requestId || null,
-    path: req.originalUrl,
-    method: req.method,
-    at: new Date().toISOString()
-  };
+  const msg =
+    code >= 500 ? "internal_error" :
+    err?.message || "bad_request";
 
-  console.error("❌ API ERROR", payload, err.stack || "");
+  if (code >= 500) {
+    console.error("[ERROR]", { rid, code, msg, err });
+  }
 
-  res.status(status).json(payload);
+  res.status(code).json({ error: msg, request_id: rid });
 }

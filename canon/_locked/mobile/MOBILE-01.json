@@ -1,0 +1,5 @@
+{
+  "contract": "mobile-contract.json",
+  "auth": "JWT + refresh",
+  "modes": ["user", "driver", "merchant"]
+}

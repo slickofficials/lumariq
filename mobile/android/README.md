@@ -1,0 +1,6 @@
+# Lumariq Android (Native Shell)
+- Kotlin + WebView (phase 0)
+- Deep links: lumariq://...
+- Universal links: https://app.lumariq.ai/...
+
+Next: replace WebView routes with native screens gradually.

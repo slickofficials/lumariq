@@ -1,0 +1,13 @@
+# Core framework
+fastapi==0.128.0
+uvicorn[standard]==0.40.0
+
+# Data validation
+pydantic==2.12.5
+
+# Machine learning
+torch==2.5.1
+numpy==1.26.4
+
+# Optional: WebSocket support (for real-time features)
+websockets==12.0

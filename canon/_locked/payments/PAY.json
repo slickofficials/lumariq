@@ -1,0 +1,4 @@
+{
+  "priority": ["NG","GH","BJ"],
+  "router": "auto_failover"
+}

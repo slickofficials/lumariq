@@ -1,0 +1,22 @@
+{
+  "country": "Benin",
+  "iso": "BJ",
+  "currency": "XOF",
+  "timezone": "Africa/Porto-Novo",
+  "languages": ["fr", "fon", "yor"],
+  "payments": {
+    "providers": ["paystack"],
+    "mobileMoney": ["MTN_MOMO", "MOOV_MONEY"]
+  },
+  "regulation": {
+    "kycLevel": "light",
+    "bnplAllowed": true,
+    "escrowRequired": true
+  },
+  "features": {
+    "rideHailing": true,
+    "foodDelivery": true,
+    "logistics": true,
+    "crypto": false
+  }
+}
