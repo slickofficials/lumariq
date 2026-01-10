@@ -46,14 +46,13 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val context = LocalContext.current
                     val store = remember { UserPreferences(context) }
-                    val sensory = rememberSensorySystem() // 🧠 INITIALIZE SENSES
+                    val sensory = rememberSensorySystem()
 
                     val stealthMode by store.stealthModeFlow.collectAsState(initial = false)
                     val txHistory by store.txHistoryFlow.collectAsState(initial = emptyList())
                     val revenue by store.revenueFlow.collectAsState(initial = 0.0)
 
                     NavHost(navController = navController, startDestination = "login") {
-                        // Pass 'sensory' to all screens
                         composable("login") { LoginScreen(navController, sensory) }
                         
                         composable("dashboard") {
@@ -65,6 +64,8 @@ class MainActivity : ComponentActivity() {
                         composable("map") { SurgeMapScreen(navController, sensory) }
                         composable("security") { SecurityScreen(navController) }
                         composable("profile") { ProfileScreen(navController) }
+                        // 🧠 NEW ROUTE
+                        composable("chat") { ChatScreen(navController, sensory) }
                     }
                 }
             }
@@ -72,7 +73,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// 🔊 UPDATE DASHBOARD TO USE SENSORY
 @Composable
 fun HackerDashboard(
     navController: NavController, userHandle: String, tier: UserTier, balance: Double, currency: String, isStealthMode: Boolean, txHistory: List<String>,
@@ -84,14 +84,16 @@ fun HackerDashboard(
             AnimatedLiquidityCard(balance, currency, isStealthMode)
             
             Text("SYSTEM FUNCTIONS", style = MaterialTheme.typography.labelSmall)
+            
+            // 🧠 UPDATED GRID WITH AI BUTTON
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // ADD CLICKS
                 CompactButton("TRANSFER", { sensory.feedbackClick(); navController.navigate("transfer") }, Modifier.weight(1f))
                 CompactButton("RADAR", { sensory.feedbackClick(); navController.navigate("map") }, Modifier.weight(1f))
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 CompactButton("ANALYTICS", { sensory.feedbackClick(); navController.navigate("analytics") }, Modifier.weight(1f))
-                CompactButton("SECURITY", { sensory.feedbackClick(); navController.navigate("security") }, Modifier.weight(1f))
+                // 🧠 REPLACED SECURITY WITH AI
+                CompactButton("LUMARIQ AI", { sensory.feedbackClick(); navController.navigate("chat") }, Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(8.dp))
