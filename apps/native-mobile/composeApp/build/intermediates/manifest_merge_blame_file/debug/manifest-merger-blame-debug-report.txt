@@ -8,120 +8,138 @@
 8        android:minSdkVersion="24"
 9        android:targetSdkVersion="34" />
 10
-11    <permission
-11-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
-12        android:name="com.lumariq.android.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-12-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
-13        android:protectionLevel="signature" />
-13-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+11    <uses-permission android:name="android.permission.VIBRATE" />
+11-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:4:5-66
+11-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:4:22-63
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:5:5-67
+12-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:5:22-64
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:6:5-79
+13-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:6:22-76
 14
-15    <uses-permission android:name="com.lumariq.android.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-15-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
-15-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
-16
-17    <application
-17-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:2:5-16:19
-18        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-18-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
-19        android:debuggable="true"
-20        android:extractNativeLibs="false"
-21        android:icon="@drawable/ic_terminal_launcher"
-21-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:4:9-54
-22        android:label="Lumariq OS"
-22-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:3:9-35
-23        android:roundIcon="@drawable/ic_terminal_launcher"
-23-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:5:9-59
-24        android:theme="@style/Theme.Lumariq" >
-24-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:6:9-45
-25        <activity
-25-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:8:9-15:20
-26            android:name="com.lumariq.android.MainActivity"
-26-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:9:13-41
-27            android:exported="true" >
-27-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:10:13-36
-28            <intent-filter>
-28-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:11:13-14:29
-29                <action android:name="android.intent.action.MAIN" />
-29-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:12:17-69
-29-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:12:25-66
-30
-31                <category android:name="android.intent.category.LAUNCHER" />
-31-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:13:17-77
-31-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:13:27-74
-32            </intent-filter>
-33        </activity>
-34        <activity
-34-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\slick\.gradle\caches\transforms-3\ccae0c0f2a4f672d2b8f6f0846584df9\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
-35            android:name="androidx.compose.ui.tooling.PreviewActivity"
-35-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\slick\.gradle\caches\transforms-3\ccae0c0f2a4f672d2b8f6f0846584df9\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
-36            android:exported="true" />
-36-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\slick\.gradle\caches\transforms-3\ccae0c0f2a4f672d2b8f6f0846584df9\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
-37
-38        <provider
-38-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-39            android:name="androidx.startup.InitializationProvider"
-39-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-40            android:authorities="com.lumariq.android.androidx-startup"
-40-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-41            android:exported="false" >
-41-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-42            <meta-data
-42-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-43                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-43-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-44                android:value="androidx.startup" />
-44-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-45            <meta-data
-45-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\slick\.gradle\caches\transforms-3\5dd580d9056fb7d4e28f0ad02dfb7069\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
-46                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-46-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\slick\.gradle\caches\transforms-3\5dd580d9056fb7d4e28f0ad02dfb7069\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
-47                android:value="androidx.startup" />
-47-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\slick\.gradle\caches\transforms-3\5dd580d9056fb7d4e28f0ad02dfb7069\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
-48            <meta-data
-48-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-49                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-49-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-50                android:value="androidx.startup" />
-50-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-51        </provider>
-52
-53        <receiver
-53-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-54            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-54-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-55            android:directBootAware="false"
-55-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-56            android:enabled="true"
-56-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-57            android:exported="true"
-57-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-58            android:permission="android.permission.DUMP" >
-58-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-59            <intent-filter>
-59-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-60                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-60-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-60-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-61            </intent-filter>
-62            <intent-filter>
-62-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-63                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-63-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-63-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-64            </intent-filter>
-65            <intent-filter>
-65-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-66                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-66-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-66-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-67            </intent-filter>
-68            <intent-filter>
-68-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-69                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-69-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-69-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-70            </intent-filter>
-71        </receiver>
-72    </application>
-73
-74</manifest>
+15    <permission
+15-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+16        android:name="com.lumariq.android.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+16-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+17        android:protectionLevel="signature" />
+17-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+18
+19    <uses-permission android:name="com.lumariq.android.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+19-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+19-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+20
+21    <application
+21-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:8:5-26:19
+22        android:allowBackup="true"
+22-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:9:9-35
+23        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+23-->[androidx.core:core:1.12.0] C:\Users\slick\.gradle\caches\transforms-3\ee0f5296a58ff1637978eaa7544bdddf\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+24        android:debuggable="true"
+25        android:extractNativeLibs="false"
+26        android:icon="@drawable/ic_lumariq_node"
+26-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:10:9-49
+27        android:label="Lumariq"
+27-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:11:9-32
+28        android:roundIcon="@drawable/ic_lumariq_node"
+28-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:12:9-54
+29        android:supportsRtl="true"
+29-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:13:9-35
+30        android:theme="@android:style/Theme.Material.NoActionBar" >
+30-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:14:9-66
+31        <activity
+31-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:16:9-25:20
+32            android:name="com.lumariq.android.MainActivity"
+32-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:17:13-41
+33            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+33-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:19:13-225
+34            android:exported="true"
+34-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:18:13-36
+35            android:windowSoftInputMode="adjustResize" >
+35-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:20:13-55
+36            <intent-filter>
+36-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:21:13-24:29
+37                <action android:name="android.intent.action.MAIN" />
+37-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:22:17-69
+37-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:22:25-66
+38
+39                <category android:name="android.intent.category.LAUNCHER" />
+39-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:23:17-77
+39-->C:\Users\slick\lumariq\apps\native-mobile\composeApp\src\main\AndroidManifest.xml:23:27-74
+40            </intent-filter>
+41        </activity>
+42        <activity
+42-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\slick\.gradle\caches\transforms-3\ccae0c0f2a4f672d2b8f6f0846584df9\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+43            android:name="androidx.compose.ui.tooling.PreviewActivity"
+43-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\slick\.gradle\caches\transforms-3\ccae0c0f2a4f672d2b8f6f0846584df9\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+44            android:exported="true" />
+44-->[androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\slick\.gradle\caches\transforms-3\ccae0c0f2a4f672d2b8f6f0846584df9\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+45
+46        <provider
+46-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+47            android:name="androidx.startup.InitializationProvider"
+47-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+48            android:authorities="com.lumariq.android.androidx-startup"
+48-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+49            android:exported="false" >
+49-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+50            <meta-data
+50-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+51                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+51-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+52                android:value="androidx.startup" />
+52-->[androidx.emoji2:emoji2:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\5f3a06efda8dcb0af76b7c678309b128\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+53            <meta-data
+53-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\slick\.gradle\caches\transforms-3\5dd580d9056fb7d4e28f0ad02dfb7069\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+54                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+54-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\slick\.gradle\caches\transforms-3\5dd580d9056fb7d4e28f0ad02dfb7069\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+55                android:value="androidx.startup" />
+55-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\slick\.gradle\caches\transforms-3\5dd580d9056fb7d4e28f0ad02dfb7069\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+56            <meta-data
+56-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+57                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+57-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+58                android:value="androidx.startup" />
+58-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+59        </provider>
+60
+61        <receiver
+61-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+62            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+62-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+63            android:directBootAware="false"
+63-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+64            android:enabled="true"
+64-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+65            android:exported="true"
+65-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+66            android:permission="android.permission.DUMP" >
+66-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+67            <intent-filter>
+67-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+68                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+68-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+68-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+69            </intent-filter>
+70            <intent-filter>
+70-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+71                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+71-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+71-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+72            </intent-filter>
+73            <intent-filter>
+73-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+74                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+74-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+74-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+75            </intent-filter>
+76            <intent-filter>
+76-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+77                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+77-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+77-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\slick\.gradle\caches\transforms-3\b798e48ae570085968098524f463c6eb\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+78            </intent-filter>
+79        </receiver>
+80    </application>
+81
+82</manifest>

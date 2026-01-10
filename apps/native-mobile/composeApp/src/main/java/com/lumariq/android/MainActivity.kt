@@ -45,23 +45,24 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     val navController = rememberNavController()
                     val context = LocalContext.current
-                    
                     val store = remember { UserPreferences(context) }
+                    val sensory = rememberSensorySystem() // 🧠 INITIALIZE SENSES
+
                     val stealthMode by store.stealthModeFlow.collectAsState(initial = false)
                     val txHistory by store.txHistoryFlow.collectAsState(initial = emptyList())
                     val revenue by store.revenueFlow.collectAsState(initial = 0.0)
 
-                    // ⚡ CHANGED START DESTINATION TO 'login'
                     NavHost(navController = navController, startDestination = "login") {
-                        composable("login") { LoginScreen(navController) }
+                        // Pass 'sensory' to all screens
+                        composable("login") { LoginScreen(navController, sensory) }
                         
                         composable("dashboard") {
                             val totalBalance = walletState.localBalance + revenue
-                            HackerDashboard(navController, user.handle, user.tier, totalBalance, walletState.localCurrency, stealthMode, txHistory)
+                            HackerDashboard(navController, user.handle, user.tier, totalBalance, walletState.localCurrency, stealthMode, txHistory, sensory)
                         }
-                        composable("transfer") { TransferScreen(navController) }
+                        composable("transfer") { TransferScreen(navController, sensory) }
                         composable("analytics") { AnalyticsScreen(navController) }
-                        composable("map") { SurgeMapScreen(navController) }
+                        composable("map") { SurgeMapScreen(navController, sensory) }
                         composable("security") { SecurityScreen(navController) }
                         composable("profile") { ProfileScreen(navController) }
                     }
@@ -71,13 +72,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// ... (Rest of components remain unchanged, reusing from previous steps)
-// We need to re-include the components because we overwrote the file.
-// For brevity in this "Shell", I will re-inject the necessary Dashboard components below.
-
+// 🔊 UPDATE DASHBOARD TO USE SENSORY
 @Composable
 fun HackerDashboard(
-    navController: NavController, userHandle: String, tier: UserTier, balance: Double, currency: String, isStealthMode: Boolean, txHistory: List<String>
+    navController: NavController, userHandle: String, tier: UserTier, balance: Double, currency: String, isStealthMode: Boolean, txHistory: List<String>,
+    sensory: SensorySystem
 ) {
     Scaffold(containerColor = Color.Transparent) { padding ->
         Column(modifier = Modifier.padding(padding).padding(24.dp).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -86,12 +85,13 @@ fun HackerDashboard(
             
             Text("SYSTEM FUNCTIONS", style = MaterialTheme.typography.labelSmall)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CompactButton("TRANSFER", { navController.navigate("transfer") }, Modifier.weight(1f))
-                CompactButton("RADAR", { navController.navigate("map") }, Modifier.weight(1f))
+                // ADD CLICKS
+                CompactButton("TRANSFER", { sensory.feedbackClick(); navController.navigate("transfer") }, Modifier.weight(1f))
+                CompactButton("RADAR", { sensory.feedbackClick(); navController.navigate("map") }, Modifier.weight(1f))
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CompactButton("ANALYTICS", { navController.navigate("analytics") }, Modifier.weight(1f))
-                CompactButton("SECURITY", { navController.navigate("security") }, Modifier.weight(1f))
+                CompactButton("ANALYTICS", { sensory.feedbackClick(); navController.navigate("analytics") }, Modifier.weight(1f))
+                CompactButton("SECURITY", { sensory.feedbackClick(); navController.navigate("security") }, Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(8.dp))

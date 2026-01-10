@@ -5,5 +5,8 @@ array com_google_android_gms_fonts_certs_dev
 array com_google_android_gms_fonts_certs_prod
 color black
 color lumariq_green
+drawable ic_lumariq_node
 drawable ic_terminal_launcher
+mipmap ic_launcher
+mipmap ic_launcher_round
 style Theme.Lumariq

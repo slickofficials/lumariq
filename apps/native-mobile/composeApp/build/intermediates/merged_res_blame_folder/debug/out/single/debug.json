@@ -2,5 +2,17 @@
     {
         "merged": "com.lumariq.android.composeApp-merged_res-65:/drawable_ic_terminal_launcher.xml.flat",
         "source": "com.lumariq.android.composeApp-main-67:/drawable/ic_terminal_launcher.xml"
+    },
+    {
+        "merged": "com.lumariq.android.composeApp-merged_res-65:/drawable_ic_lumariq_node.xml.flat",
+        "source": "com.lumariq.android.composeApp-main-67:/drawable/ic_lumariq_node.xml"
+    },
+    {
+        "merged": "com.lumariq.android.composeApp-merged_res-65:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.lumariq.android.composeApp-main-67:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.lumariq.android.composeApp-merged_res-65:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.lumariq.android.composeApp-main-67:/mipmap-xhdpi/ic_launcher_round.png"
     }
 ]

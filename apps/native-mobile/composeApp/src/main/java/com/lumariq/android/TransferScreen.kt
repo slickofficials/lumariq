@@ -24,22 +24,25 @@ import kotlin.random.Random
 enum class TxState { IDLE, PROCESSING, SUCCESS, FAILED }
 
 @Composable
-fun TransferScreen(navController: NavController) {
+fun TransferScreen(navController: NavController, sensory: SensorySystem) {
     var amount by remember { mutableStateOf("") }
     var recipient by remember { mutableStateOf("") }
     var txState by remember { mutableStateOf(TxState.IDLE) }
     var terminalLog by remember { mutableStateOf("") }
     var txHash by remember { mutableStateOf("") }
     
-    // 🧠 LEDGER LINK
     val context = LocalContext.current
     val store = remember { UserPreferences(context) }
     val scope = rememberCoroutineScope()
 
     fun executeTransfer() {
-        if (amount.isBlank() || recipient.isBlank()) return
+        if (amount.isBlank() || recipient.isBlank()) {
+            sensory.feedbackError() // ERROR BUZZ
+            return
+        }
         
         scope.launch {
+            sensory.feedbackClick()
             txState = TxState.PROCESSING
             terminalLog = "> INITIATING HANDSHAKE..."
             delay(600)
@@ -50,13 +53,12 @@ fun TransferScreen(navController: NavController) {
             terminalLog += "\n> BROADCASTING TO LEDGER..."
             delay(600)
             
-            // Generate Hash
             val charPool = "A-Z0-9"
             txHash = "0x" + (1..16).map { Random.nextInt(0, charPool.length) }.joinToString("")
-            
-            // 💾 COMMIT TO DISK
             store.addTransaction(amount, recipient, txHash)
             
+            // 🔊 SENSORY FEEDBACK
+            sensory.feedbackSuccess()
             txState = TxState.SUCCESS
         }
     }
@@ -111,7 +113,7 @@ fun TransferScreen(navController: NavController) {
                     }
 
                     OutlinedButton(
-                        onClick = { navController.popBackStack() },
+                        onClick = { sensory.feedbackClick(); navController.popBackStack() },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
                         modifier = Modifier.fillMaxWidth()
@@ -158,7 +160,7 @@ fun TransferScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Button(
-                        onClick = { navController.popBackStack() },
+                        onClick = { sensory.feedbackClick(); navController.popBackStack() },
                         colors = ButtonDefaults.buttonColors(containerColor = TerminalGreen),
                         modifier = Modifier.fillMaxWidth().height(56.dp)
                     ) {

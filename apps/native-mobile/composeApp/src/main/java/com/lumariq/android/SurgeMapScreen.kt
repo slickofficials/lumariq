@@ -27,7 +27,7 @@ import kotlin.random.Random
 data class SurgeNode(val id: String, val x: Float, val y: Float, val value: Double)
 
 @Composable
-fun SurgeMapScreen(navController: NavController) {
+fun SurgeMapScreen(navController: NavController, sensory: SensorySystem) {
     val context = LocalContext.current
     val store = remember { UserPreferences(context) }
     val scope = rememberCoroutineScope()
@@ -76,6 +76,8 @@ fun SurgeMapScreen(navController: NavController) {
                                         val nodeY = center.y + (node.y - 0.5f) * 2 * (radius * 0.9f)
                                         val dist = sqrt((tapOffset.x - nodeX).pow(2) + (tapOffset.y - nodeY).pow(2))
                                         if (dist < 40f) { 
+                                            // 🔊 SENSORY FEEDBACK
+                                            sensory.feedbackRadarBlip()
                                             scope.launch {
                                                 store.addRevenue(node.value)
                                                 snackbarHostState.showSnackbar("🚀 DISPATCHED: ${node.id} | +${node.value.toInt()} NGN")
@@ -104,16 +106,13 @@ fun SurgeMapScreen(navController: NavController) {
                 }
             }
 
-            // SHARED COMPONENT USED HERE
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 StatCard("DEMAND", "CRITICAL", Modifier.weight(1f))
                 StatCard("REVENUE", "ACTIVE", Modifier.weight(1f))
             }
-            
             Spacer(modifier = Modifier.weight(1f))
-
             OutlinedButton(
-                onClick = { navController.popBackStack() },
+                onClick = { sensory.feedbackClick(); navController.popBackStack() },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TerminalGreen),
                 border = BorderStroke(1.dp, TerminalGreen),
                 modifier = Modifier.fillMaxWidth().height(56.dp)
