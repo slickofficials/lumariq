@@ -38,3 +38,9 @@ node_modules/
 dist/
 .env.local
 .bak/
+
+# local backups / patch artifacts
+_archive/
+*.bak.*
+*.BROKEN.*
+run.*.log
