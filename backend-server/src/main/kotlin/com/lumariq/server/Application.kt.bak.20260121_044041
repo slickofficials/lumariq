@@ -1,0 +1,133 @@
+package com.lumariq.server
+
+import com.lumariq.server.db.DatabaseBootstrap
+import com.lumariq.server.plugins.configureObservability
+import com.lumariq.server.routes.healthRoutes
+import com.lumariq.server.transferAuthRoutes
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import java.time.Instant
+import java.util.UUID
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class Transaction(
+    val id: String,
+    val type: String,
+    val amount: Long,
+    val currency: String,
+    val status: String,
+    val counterparty: String?,
+    val memo: String?,
+    val createdAt: String
+)
+
+@Serializable
+data class TransactionRequest(val recipient: String, val amount: Double)
+
+@Serializable
+data class TransactionResponse(val status: String, val txId: String, val message: String)
+
+object TransactionStore {
+    private val transactions = mutableListOf<Transaction>()
+
+    init { seedData() }
+
+    private fun seedData() {
+        val parties = listOf("Uber", "AWS", "Starbucks", "Salary", "Rent", "Spotify", "TransferWise")
+        val now = Instant.now()
+
+        for (i in 0 until 10) {
+            val isCredit = i % 3 == 0
+            val party = parties.random()
+
+            transactions.add(
+                Transaction(
+                    id = UUID.randomUUID().toString(),
+                    type = if (isCredit) "CREDIT" else "DEBIT",
+                    amount = (1500..80000).random().toLong(),
+                    currency = "USD",
+                    status = "COMPLETED",
+                    counterparty = party,
+                    memo = if (isCredit) "Direct Deposit" else "Card Payment: $party",
+                    createdAt = now.minusSeconds(i * 86400L + (1..1000).random()).toString()
+                )
+            )
+        }
+        transactions.sortByDescending { it.createdAt }
+    }
+
+    fun getAll(): List<Transaction> = transactions.toList()
+
+    fun add(recipient: String, amountDouble: Double): String {
+        val txId = "TX-" + UUID.randomUUID().toString().take(8).uppercase()
+        val cents = (amountDouble * 100).toLong()
+
+        val newTx = Transaction(
+            id = txId,
+            type = "DEBIT",
+            amount = cents,
+            currency = "USD",
+            status = "COMPLETED",
+            counterparty = recipient,
+            memo = "Wire Transfer to $recipient",
+            createdAt = Instant.now().toString()
+        )
+
+        synchronized(this) { transactions.add(0, newTx) }
+        return txId
+    }
+}
+
+fun main() {
+    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+        .start(wait = true)
+}
+
+fun Application.module() {
+    val ds = DatabaseBootstrap.init()
+
+    configureObservability()
+    healthRoutes(ds)
+
+    install(ContentNegotiation) {
+        json(Json {
+            prettyPrint = true
+            isLenient = true
+            ignoreUnknownKeys = true
+        })
+    }
+
+    routing {
+        transferAuthRoutes()
+
+        get("/") { call.respondText("LUMARIQ CENTRAL BANK: ONLINE") }
+
+        get("/status") {
+            call.respond(mapOf("status" to "OPERATIONAL", "tier" to "GOVERNOR"))
+        }
+
+        get("/v1/transactions") {
+            call.respond(TransactionStore.getAll())
+        }
+
+        post("/transfer") {
+            try {
+                val req = call.receive<TransactionRequest>()
+                println("⚡ TRANSFER ORDER: $${req.amount} -> ${req.recipient}")
+                kotlinx.coroutines.delay(300)
+                val txId = TransactionStore.add(req.recipient, req.amount)
+                call.respond(TransactionResponse("SUCCESS", txId, "FUNDS DISPATCHED"))
+            } catch (e: Exception) {
+                call.respond(TransactionResponse("FAILED", "NULL", e.localizedMessage ?: "Unknown Error"))
+            }
+        }
+    }
+}

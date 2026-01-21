@@ -1,0 +1,163 @@
+﻿package com.lumariq.android
+
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.lumariq.android.ui.theme.TerminalGreen
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransferScreen(nav: NavController, sensory: SensorySystem) {
+    val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var recipient by remember { mutableStateOf("") }
+    var amountTxt by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("Enter recipient + amount. LONG-PRESS AUTHORIZE.") }
+    var busy by remember { mutableStateOf(false) }
+    var longOk by remember { mutableStateOf(false) }
+
+    fun stashAndGoAuth(prep: PrepareTransferResp, rec: String, amt: Double) {
+        nav.currentBackStackEntry?.savedStateHandle?.set("pending_recipient", rec)
+        nav.currentBackStackEntry?.savedStateHandle?.set("pending_amount", amt)
+        nav.currentBackStackEntry?.savedStateHandle?.set("pending_currency", "USD")
+        nav.currentBackStackEntry?.savedStateHandle?.set("pending_intentId", prep.intentId)
+        nav.currentBackStackEntry?.savedStateHandle?.set("pending_challenge", prep.challenge)
+        nav.currentBackStackEntry?.savedStateHandle?.set("pending_expiresAt", prep.expiresAt)
+        nav.navigate("auth")
+    }
+
+    Scaffold(
+        containerColor = Color.Black,
+        topBar = {
+            TopAppBar(
+                title = { Text(">_ TRANSFER", color = TerminalGreen, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black),
+                navigationIcon = {
+                    TextButton(onClick = { nav.popBackStack() }) { Text("< BACK", color = TerminalGreen) }
+                }
+            )
+        }
+    ) { pad ->
+        Column(
+            Modifier.fillMaxSize().padding(pad).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedTextField(
+                value = recipient,
+                onValueChange = { recipient = it },
+                label = { Text("Recipient", color = TerminalGreen) },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TerminalGreen,
+                    unfocusedBorderColor = Color.DarkGray,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    cursorColor = TerminalGreen,
+                    focusedLabelColor = TerminalGreen,
+                    unfocusedLabelColor = TerminalGreen
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = amountTxt,
+                onValueChange = { amountTxt = it },
+                label = { Text("Amount (e.g. 5000.00)", color = TerminalGreen) },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TerminalGreen,
+                    unfocusedBorderColor = Color.DarkGray,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    cursorColor = TerminalGreen,
+                    focusedLabelColor = TerminalGreen,
+                    unfocusedLabelColor = TerminalGreen
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
+                border = BorderStroke(1.dp, Color.DarkGray),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(message, color = Color(0xFFBDBDBD), modifier = Modifier.padding(12.dp))
+            }
+
+            Surface(
+                color = if (longOk) Color(0xFF123018) else Color(0xFF2A2A2A),
+                contentColor = Color.White,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .pointerInput(busy, recipient, amountTxt) {
+                        detectTapGestures(
+                            onTap = {
+                                Toast.makeText(ctx, "Tap detected (not long-press)", Toast.LENGTH_SHORT).show()
+                                Log.d("LUMARIQ_GESTURE", "TAP on authorize surface")
+                                message = "Tap detected. Now LONG-PRESS and hold ~1s."
+                            },
+                            onLongPress = {
+                                Toast.makeText(ctx, "âœ… LONG PRESS DETECTED", Toast.LENGTH_SHORT).show()
+                                Log.d("LUMARIQ_GESTURE", "LONG PRESS detected")
+                                longOk = true
+
+                                val rec = recipient.trim()
+                                val amt = amountTxt.toDoubleOrNull()
+                                if (rec.isBlank() || amt == null || amt <= 0.0) {
+                                    message = "Invalid recipient/amount"
+                                    return@detectTapGestures
+                                }
+                                if (busy) return@detectTapGestures
+                                busy = true
+                                message = "Preparing secure intent..."
+                                scope.launch {
+                                    try {
+                                        val prep = NetworkClient.prepareTransfer(rec, amt, "USD")
+                                        message = "Prepared. Opening AUTH..."
+                                        stashAndGoAuth(prep, rec, amt)
+                                    } catch (e: Exception) {
+                                        message = "Prepare failed: ${e.message ?: "unknown"}"
+                                    } finally {
+                                        busy = false
+                                    }
+                                }
+                            }
+                        )
+                    }
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    Text(
+                        text = when {
+                            busy -> "PREPARING..."
+                            longOk -> "LONG PRESS OK"
+                            else -> "HOLD TO AUTHORIZE"
+                        },
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Text(
+                "Auth flow: prepare â†’ confirm (signature). No PIN is shown on-screen.",
+                color = Color(0xFF8A8A8A),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+

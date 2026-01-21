@@ -1,0 +1,2960 @@
+== LUMARIQ export start: 20260111_102719 ==
+PWD: /c/Users/slick/lumariq
+✅ Gradle root detected: /c/Users/slick/lumariq/apps/native-mobile
+📋 Building include list...
+✅ Include list built: 21 items
+📦 Creating zip: lumariq_CORE_CONTEXT_20260111_102719.zip (Windows tar)
+tar: The following options were used after non-option arguments.  These options are positional and affect only arguments that follow them.  Please, rearrange them properly.
+tar: --exclude-vcs has no effect
+tar: --exclude ‘**/node_modules/**’ has no effect
+tar: --exclude ‘**/.git/**’ has no effect
+tar: --exclude ‘**/.gradle/**’ has no effect
+tar: --exclude ‘**/build/**’ has no effect
+tar: --exclude ‘**/dist/**’ has no effect
+tar: --exclude ‘**/out/**’ has no effect
+tar: --exclude ‘**/target/**’ has no effect
+tar: --exclude ‘**/wheels/**’ has no effect
+tar: --exclude ‘**/*.whl’ has no effect
+tar: --exclude ‘**/*.exe’ has no effect
+tar: --exclude ‘**/*.dll’ has no effect
+tar: --exclude ‘**/.env’ has no effect
+tar: --exclude ‘**/.env.*’ has no effect
+tar: --exclude ‘**/local.properties’ has no effect
+tar: Exiting with failure status due to previous errors
+⚠️ tar reported errors (some files may have been skipped).
+
+== DONE ==
+➡️ ZIP: /c/Users/slick/lumariq/apps/native-mobile/lumariq_CORE_CONTEXT_20260111_102719.zip
+🧾 LOG: /c/Users/slick/lumariq/apps/native-mobile/lumariq_export_20260111_102719.log
+-rw-r--r-- 1 slick 197609 100K Jan 11 10:27 lumariq_CORE_CONTEXT_20260111_102719.zip
+==========================================
+If the terminal closes, open the log file:
+  /c/Users/slick/lumariq/apps/native-mobile/lumariq_export_20260111_102719.log
+==========================================
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ clear
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mbash -lc '[27m
+[7mset -u[27m
+
+[7m# ==============================[27m
+[7m# LUMARIQ: DUMP TRANSFER FILES[27m
+[7m# ==============================[27m
+
+[7m# Find repo root safely[27m
+[7mROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"[27m
+[7mcd "$ROOT" || exit 1[27m
+
+[7mecho "========================================"[27m
+[7mecho "📂 Repo root: $ROOT"[27m
+[7mecho "========================================"[27m
+[7mecho[27m
+
+[7mFILES=([27m
+[7m  "apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt"[27m
+[7m  "apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt"[27m
+[7m)[27m
+
+[7mfor f in "${FILES[@]}"; do[27m
+[7m  if [ -f "$f" ]; then[27m
+[7m    echo "================ FILE: $f ================"[27m
+[7m    sed -n "1,300p" "$f"[27m
+[7m    echo[27m
+[7m    echo "============ END FILE: $f ================"[27m
+[7m    echo[27m
+[7m  else[27m
+[7m    echo "❌ FILE NOT FOUND: $f"[27m
+[7m    echo[27m
+[7m  fi[27m
+[7mdone[27m
+
+[7mecho "✅ DONE — copy the output above and paste it into chat."[27m
+[7m'[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[Cbash -lc '
+set -u
+
+# ==============================
+# LUMARIQ: DUMP TRANSFER FILES
+# ==============================
+
+# Find repo root safely
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$ROOT" || exit 1
+
+echo "========================================"
+echo "📂 Repo root: $ROOT"
+echo "========================================"
+echo
+
+FILES=(
+  "apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt"
+  "apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt"
+)
+
+for f in "${FILES[@]}"; do
+  if [ -f "$f" ]; then
+    echo "================ FILE: $f ================"
+    sed -n "1,300p" "$f"
+    echo
+    echo "============ END FILE: $f ================"
+    echo
+  else
+    echo "❌ FILE NOT FOUND: $f"
+    echo
+  fi
+done
+
+echo "✅ DONE — copy the output above and paste it into chat."
+'
+[?2004l========================================
+📂 Repo root: C:/Users/slick/lumariq
+========================================
+
+================ FILE: apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt ================
+package com.lumariq.android
+
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class TransferReq(val recipient: String, val amount: Double)
+
+@Serializable
+data class TransferResp(val status: String, val txId: String, val message: String)
+
+object NetworkClient {
+    private const val BASE_URL = "http://10.0.2.2:8080"
+
+    private val client = HttpClient(OkHttp) {
+        install(ContentNegotiation) {
+            json(Json { ignoreUnknownKeys = true; isLenient = true })
+        }
+    }
+
+    suspend fun check(): String =
+        try { client.get("$BASE_URL/").bodyAsText() }
+        catch (e: Exception) { "OFFLINE: ${e.message}" }
+
+    suspend fun executeTransfer(recipient: String, amount: Double): TransferResp {
+        return try {
+            val response: HttpResponse = client.post("$BASE_URL/transfer") {
+                contentType(ContentType.Application.Json)
+                setBody(TransferReq(recipient, amount))
+            }
+            response.body()
+        } catch (e: Exception) {
+            TransferResp("ERROR", "000", e.message ?: "Network Failure")
+        }
+    }
+}
+
+============ END FILE: apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt ================
+
+================ FILE: apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt ================
+package com.lumariq.android
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.lumariq.android.ui.theme.TerminalGreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+@Composable
+fun TransferScreen(nav: NavController, sensory: SensorySystem) {
+    var recipient by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf("READY") }
+    var txId by remember { mutableStateOf("") }
+    
+    // Hold-to-Send Logic
+    var isHolding by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(0f) }
+    val scope = rememberCoroutineScope()
+
+    // Animation for the hold button
+    LaunchedEffect(isHolding) {
+        if (isHolding) {
+            val startTime = System.currentTimeMillis()
+            while (isHolding && progress < 1f) {
+                val elapsed = System.currentTimeMillis() - startTime
+                progress = (elapsed / 1500f).coerceAtMost(1f) // 1.5 seconds to confirm
+                delay(16)
+            }
+            if (progress >= 1f) {
+                // EXECUTE
+                isHolding = false
+                sensory.feedbackClick()
+                status = "EXECUTING..."
+                scope.launch {
+                    val amt = amount.toDoubleOrNull() ?: 0.0
+                    val res = NetworkClient.executeTransfer(recipient, amt)
+                    status = if (res.status == "SUCCESS") "CONFIRMED" else "FAILED"
+                    txId = res.txId
+                }
+            }
+        } else {
+            progress = 0f
+        }
+    }
+
+    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Text(">_ WIRE TRANSFER", color = TerminalGreen, style = MaterialTheme.typography.headlineMedium)
+
+        OutlinedTextField(
+            value = recipient,
+            onValueChange = { recipient = it },
+            label = { Text("RECIPIENT ID", color = Color.Gray) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TerminalGreen,
+                unfocusedBorderColor = Color.DarkGray,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = amount,
+            onValueChange = { amount = it },
+            label = { Text("AMOUNT (USD)", color = Color.Gray) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TerminalGreen,
+                unfocusedBorderColor = Color.DarkGray,
+                focusedTextColor = TerminalGreen,
+                unfocusedTextColor = TerminalGreen
+            ),
+            textStyle = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        // STATUS DISPLAY
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF111111)),
+            border = BorderStroke(1.dp, if (status == "FAILED") Color.Red else TerminalGreen),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text("STATUS: $status", color = if (status == "FAILED") Color.Red else Color.White)
+                if (txId.isNotEmpty()) {
+                    Text("TXID: $txId", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
+                }
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        // HOLD BUTTON
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .background(Color(0xFF222222), RoundedCornerShape(8.dp))
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            if (status != "EXECUTING") {
+                                isHolding = true
+                                sensory.feedbackClick()
+                                tryAwaitRelease()
+                                isHolding = false
+                            }
+                        }
+                    )
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            // Progress Fill
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .align(Alignment.CenterStart)
+                    .background(TerminalGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+            )
+            Text(
+                if (progress >= 1f) "SENT" else "HOLD TO AUTHORIZE",
+                color = if (progress > 0.5f) Color.Black else Color.White,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Button(
+            onClick = { nav.popBackStack() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("CANCEL", color = Color.Gray)
+        }
+    }
+}
+
+============ END FILE: apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt ================
+
+✅ DONE — copy the output above and paste it into chat.
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ clear
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ bash -lc '
+set -u
+TS="$(date +%Y%m%d_%H%M%S)"
+LOG="lumariq_patch_transfer_${TS}.log"
+exec > >(tee -a "$LOG") 2>&1
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "${ROOT}" ]; then
+  echo "❌ Not inside a git repo."
+  exit 0
+fi
+cd "$ROOT" || exit 0
+
+echo "✅ Repo root: $ROOT"
+echo "🧾 Log: $ROOT/$LOG"
+
+mkdir -p _bak
+
+# Paths
+NC="apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt"
+TSCR="apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt"
+
+# Backup if present
+[ -f "$NC" ] && cp "$NC" "_bak/NetworkClient.kt.$TS" || echo "⚠️ Missing: $NC"
+[ -f "$TSCR" ] && cp "$TSCR" "_bak/TransferScreen.kt.$TS" || echo "⚠️ Missing: $TSCR"
+
+# Patch NetworkClient.kt
+cat > "$NC" << '"'"'EOF'"'"'
+package com.lumariq.android
+
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.httptimeout.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class TransferReq(val recipient: String, val amount: Double)
+
+@Serializable
+data class TransferResp(val status: String, val txId: String, val message: String)
+
+object NetworkClient {
+    private const val BASE_URL = "http://10.0.2.2:8080"
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        explicitNulls = false
+    }    private val client = HttpClient(OkHttp) {        expectSuccess = false        install(ContentNegotiation) {            json(json)        }        install(HttpTimeout) {            connectTimeoutMillis = 5_000            requestTimeoutMillis = 10_000            socketTimeoutMillis = 10_000        }        defaultRequest {            url(BASE_URL)            contentType(ContentType.Application.Json)            accept(ContentType.Application.Json)        }    }    suspend fun check(): String =        runCatching { client.get("/").bodyAsText() }            .getOrElse { e -> "OFFLINE: ${e.message}" }    suspend fun executeTransfer(recipient: String, amount: Double): TransferResp {        return runCatching {            val response: HttpResponse = client.post("/transfer") {                setBody(TransferReq(recipient, amount))            }            val text = response.bodyAsText()            if (!response.status.isSuccess()) {                TransferResp(                    status = "ERROR",                    txId = "000",                    message = "HTTP ${response.status.value}: $text"                )            } else {                runCatching { json.decodeFromString(TransferResp.serializer(), text) }                    .getOrElse {                        TransferResp(                            status = "ERROR",                            txId = "000",                            message = "Bad JSON: $text"                        )                    }            }        }.getOrElse { e ->            TransferResp("ERROR", "000", e.message ?: "Network Failure")        }    }}EOF# Patch TransferScreen.ktcat > "$TSCR" << '"'"'EOF'"'"'package com.lumariq.androidimport androidx.compose.foundation.BorderStrokeimport androidx.compose.foundation.backgroundimport androidx.compose.foundation.gestures.detectTapGesturesimport androidx.compose.foundation.layout.*import androidx.compose.foundation.shape.RoundedCornerShapeimport androidx.compose.foundation.text.KeyboardOptionsimport androidx.compose.material3.*import androidx.compose.runtime.*import androidx.compose.ui.Alignmentimport androidx.compose.ui.Modifierimport androidx.compose.ui.graphics.Colorimport androidx.compose.ui.input.pointer.pointerInputimport androidx.compose.ui.text.input.KeyboardTypeimport androidx.compose.ui.unit.dpimport androidx.navigation.NavControllerimport com.lumariq.android.ui.theme.TerminalGreenimport kotlinx.coroutines.Dispatchersimport kotlinx.coroutines.delayimport kotlinx.coroutines.launch@Composablefun TransferScreen(nav: NavController, sensory: SensorySystem) {    var recipient by remember { mutableStateOf("") }    var amount by remember { mutableStateOf("") }    var status by remember { mutableStateOf("READY") }    var txId by remember { mutableStateOf("") }    var message by remember { mutableStateOf("") }    var isExecuting by remember { mutableStateOf(false) }    var isHolding by remember { mutableStateOf(false) }    var progress by remember { mutableStateOf(0f) }    val scope = rememberCoroutineScope()    LaunchedEffect(isHolding, isExecuting) {        if (!isHolding || isExecuting) {            progress = 0f            return@LaunchedEffect        }        val startTime = System.currentTimeMillis()        while (isHolding && progress < 1f) {            val elapsed = System.currentTimeMillis() - startTime            progress = (elapsed / 1500f).coerceAtMost(1f)            delay(16)        }        if (progress >= 1f) {            isHolding = false            sensory.feedbackClick()            val amt = amount.toDoubleOrNull()            if (recipient.isBlank() || amt == null || amt <= 0.0) {                status = "FAILED"                txId = ""                message = "Invalid recipient/amount"                progress = 0f                return@LaunchedEffect            }            isExecuting = true            status = "EXECUTING..."            txId = ""            message = ""            scope.launch(Dispatchers.IO) {                val res = NetworkClient.executeTransfer(recipient, amt)                scope.launch {                    status = if (res.status == "SUCCESS") "CONFIRMED" else "FAILED"                    txId = res.txId                    message = res.message                    isExecuting = false                    progress = 0f                }            }        }    }    Column(        Modifier.fillMaxSize().padding(24.dp),        verticalArrangement = Arrangement.spacedBy(20.dp)    ) {        Text(">_ WIRE TRANSFER", color = TerminalGreen, style = MaterialTheme.typography.headlineMedium)        OutlinedTextField(            value = recipient,            onValueChange = { recipient = it },            label = { Text("RECIPIENT ID", color = Color.Gray) },            colors = OutlinedTextFieldDefaults.colors(                focusedBorderColor = TerminalGreen,                unfocusedBorderColor = Color.DarkGray,                focusedTextColor = Color.White,                unfocusedTextColor = Color.White            ),            modifier = Modifier.fillMaxWidth()        )        OutlinedTextField(            value = amount,            onValueChange = { amount = it },            label = { Text("AMOUNT (USD)", color = Color.Gray) },            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),            colors = OutlinedTextFieldDefaults.colors(                focusedBorderColor = TerminalGreen,                unfocusedBorderColor = Color.DarkGray,                focusedTextColor = TerminalGreen,                unfocusedTextColor = TerminalGreen            ),            textStyle = MaterialTheme.typography.headlineSmall,            modifier = Modifier.fillMaxWidth()        )        Spacer(Modifier.height(20.dp))        Card(            colors = CardDefaults.cardColors(containerColor = Color(0xFF111111)),            border = BorderStroke(1.dp, if (status == "FAILED") Color.Red else TerminalGreen),            modifier = Modifier.fillMaxWidth()        ) {            Column(Modifier.padding(16.dp)) {                Text("STATUS: $status", color = if (status == "FAILED") Color.Red else Color.White)                if (txId.isNotEmpty()) {                    Text("TXID: $txId", color = Color.Gray, style = MaterialTheme.typography.labelSmall)                }                if (message.isNotBlank()) {                    Text(message, color = Color.Gray, style = MaterialTheme.typography.bodySmall)[7m                }[27m[7m            }[27m[7m        }[27m[7m        Spacer(Modifier.weight(1f))[27m[7m        Box([27m[7m            modifier = Modifier[27m[7m                .fillMaxWidth()[27m[7m                .height(60.dp)[27m[7m                .background(Color(0xFF222222), RoundedCornerShape(8.dp))[27m[7m                .pointerInput(Unit) {[27m[7m                    detectTapGestures([27m[7m                        onPress = {[27m[7m                            if (!isExecuting) {[27m[7m                                isHolding = true[27m[7m                                sensory.feedbackClick()[27m[7m                                tryAwaitRelease()[27m[7m                                isHolding = false[27m[7m                            }[27m[7m                        }[27m[7m                    )[27m[7m                },[27m[7m            contentAlignment = Alignment.Center[27m[7m        ) {[27m[7m            Box([27m[7m                modifier = Modifier[27m[7m                    .fillMaxHeight()[27m[7m                    .fillMaxWidth(progress)[27m[7m                    .align(Alignment.CenterStart)[27m[7m                    .background(TerminalGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))[27m[7m            )[27m[7m            Text([27m[7m                if (progress >= 1f) "SENT" else if (isExecuting) "SENDING..." else "HOLD TO AUTHORIZE",[27m[7m                color = if (progress > 0.5f) Color.Black else Color.White,[27m[7m                style = MaterialTheme.typography.titleMedium[27m[7m            )[27m[7m        }[27m[7m        Button([27m[7m            onClick = { nav.popBackStack() },[27m[7m            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),[27m[7m            modifier = Modifier.fillMaxWidth()[27m[7m        ) {[27m[7m            Text("CANCEL", color = Color.Gray)[27m[7m        }[27m[7m    }[27m[7m}[27m[7mEOF[27m[7mecho "✅ Patched files."[27m[7mecho "✅ Backups in _bak/"[27m[7mecho "🧾 Log saved to $LOG"[27m[7m'[27m                }            }        }        Spacer(Modifier.weight(1f))        Box(            modifier = Modifier                .fillMaxWidth()                .height(60.dp)                .background(Color(0xFF222222), RoundedCornerShape(8.dp))                .pointerInput(Unit) {                    detectTapGestures(                        onPress = {                            if (!isExecuting) {                                isHolding = true                                sensory.feedbackClick()                                tryAwaitRelease()                                isHolding = false                            }                        }                    )                },            contentAlignment = Alignment.Center        ) {            Box(                modifier = Modifier                    .fillMaxHeight()                    .fillMaxWidth(progress)                    .align(Alignment.CenterStart)                    .background(TerminalGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))            )            Text(                if (progress >= 1f) "SENT" else if (isExecuting) "SENDING..." else "HOLD TO AUTHORIZE",                color = if (progress > 0.5f) Color.Black else Color.White,                style = MaterialTheme.typography.titleMedium            )        }        Button(            onClick = { nav.popBackStack() },            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),            modifier = Modifier.fillMaxWidth()        ) {            Text("CANCEL", color = Color.Gray)        }    }}EOFecho "✅ Patched files."echo "✅ Backups in _bak/"echo "🧾 Log saved to $LOG"'
+[?2004l✅ Repo root: C:/Users/slick/lumariq
+🧾 Log: C:/Users/slick/lumariq/lumariq_patch_transfer_20260111_115315.log
+✅ Patched files.
+✅ Backups in _bak/
+🧾 Log saved to lumariq_patch_transfer_20260111_115315.log
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mgrep -n "var message" -n apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt[27m
+[7mgrep -n "HttpTimeout" -n apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt[27m[A[C[Cgrep -n "var message" -n apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt
+grep -n "HttpTimeout" -n apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt
+[?2004lgrep: apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt: No such file or directory
+grep: apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt: No such file or directory
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mcd /c/Users/slick/lumariq/apps/native-mobile[27m
+
+[7mgrep -n "var message" composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt[27m
+[7mgrep -n "HttpTimeout" composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt[27m[A[A[A[C[Ccd /c/Users/slick/lumariq/apps/native-mobile
+
+grep -n "var message" composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt
+grep -n "HttpTimeout" composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt
+[?2004l30:    var message by remember { mutableStateOf("") }
+36:        install(HttpTimeout) {
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mbash -lc '[27m
+[7mset -u[27m
+[7mROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"[27m
+[7mcd "$ROOT/apps/native-mobile" || exit 1[27m
+[7mgrep -n "var message" composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt[27m
+[7mgrep -n "HttpTimeout" composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt[27m
+[7m'[27m[A[A[A[A[A[A[Cbash -lc '
+set -u
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$ROOT/apps/native-mobile" || exit 1
+grep -n "var message" composeApp/src/androidMain/kotlin/com/lumariq/android/TransferScreen.kt
+grep -n "HttpTimeout" composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt
+'
+[?2004l30:    var message by remember { mutableStateOf("") }
+36:        install(HttpTimeout) {
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mcd /c/Users/slick/lumariq/apps/native-mobile[27m
+[7m./gradlew --stop[27m
+[7m./gradlew clean --no-daemon[27m
+[7m./gradlew :composeApp:installDebug --no-daemon --rerun-tasks[27m[A[A[A[C[Ccd /c/Users/slick/lumariq/apps/native-mobile
+./gradlew --stop
+./gradlew clean --no-daemon
+./gradlew :composeApp:installDebug --no-daemon --rerun-tasks
+[?2004lNo Gradle daemons are running.
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :shared
+w: The following Kotlin/Native targets cannot be built on this machine and are disabled:
+iosArm64, iosSimulatorArm64, iosX64
+To hide this message, add 'kotlin.native.ignoreDisabledTargets=true' to the Gradle properties.
+
+
+> Task :composeApp:clean
+> Task :shared:cleanIosSimulatorArm64Test UP-TO-DATE
+> Task :shared:cleanIosX64Test UP-TO-DATE
+> Task :shared:cleanAllTests UP-TO-DATE
+> Task :shared:clean UP-TO-DATE
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 4m 9s
+4 actionable tasks: 1 executed, 3 up-to-date
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :shared
+w: The following Kotlin/Native targets cannot be built on this machine and are disabled:
+iosArm64, iosSimulatorArm64, iosX64
+To hide this message, add 'kotlin.native.ignoreDisabledTargets=true' to the Gradle properties.
+
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors
+> Task :composeApp:generateComposeResClass
+> Task :composeApp:preBuild UP-TO-DATE
+> Task :composeApp:preDebugBuild UP-TO-DATE
+> Task :composeApp:generateDebugResValues
+> Task :composeApp:checkDebugAarMetadata
+> Task :composeApp:mapDebugSourceSetPaths
+> Task :composeApp:generateDebugResources
+> Task :composeApp:mergeDebugResources
+> Task :composeApp:packageDebugResources
+> Task :composeApp:createDebugCompatibleScreenManifests
+> Task :composeApp:extractDeepLinksDebug
+> Task :composeApp:parseDebugLocalResources
+> Task :composeApp:processDebugMainManifest
+> Task :composeApp:processDebugManifest
+> Task :composeApp:javaPreCompileDebug
+> Task :composeApp:mergeDebugShaders
+> Task :composeApp:processDebugManifestForPackage
+> Task :composeApp:compileDebugShaders NO-SOURCE
+> Task :composeApp:copyDebugFontsToAndroidAssets
+> Task :composeApp:generateDebugAssets UP-TO-DATE
+> Task :composeApp:mergeDebugAssets
+> Task :composeApp:compressDebugAssets
+> Task :composeApp:desugarDebugFileDependencies
+> Task :composeApp:mergeDebugJniLibFolders
+> Task :composeApp:checkDebugDuplicateClasses
+> Task :composeApp:mergeDebugNativeLibs NO-SOURCE
+> Task :composeApp:stripDebugDebugSymbols NO-SOURCE
+> Task :composeApp:validateSigningDebug
+> Task :composeApp:writeDebugAppMetadata
+> Task :composeApp:mergeLibDexDebug
+> Task :composeApp:writeDebugSigningConfigVersions
+> Task :composeApp:processDebugResources
+> Task :composeApp:mergeExtDexDebug
+> Task :composeApp:compileDebugKotlinAndroid
+e: Daemon compilation failed: Could not connect to Kotlin compile daemon
+java.lang.RuntimeException: Could not connect to Kotlin compile daemon
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:218)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:175)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:135)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:73)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:170)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:857)
+
+Failed to compile with Kotlin daemon: java.lang.RuntimeException: Could not connect to Kotlin compile daemon
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:218)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:175)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:135)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:73)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:170)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:857)
+Using fallback strategy: Compile without Kotlin daemon
+Try ./gradlew --stop if this issue persists.
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:6:31: error: unresolved reference: httptimeout
+exception: import io.ktor.client.plugins.httptimeout.*
+exception:                               ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:36:17: error: unresolved reference: HttpTimeout
+exception:         install(HttpTimeout) {
+exception:                 ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:37:13: error: unresolved reference: connectTimeoutMillis
+exception:             connectTimeoutMillis = 5_000
+exception:             ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:38:13: error: unresolved reference: requestTimeoutMillis
+exception:             requestTimeoutMillis = 10_000
+exception:             ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:39:13: error: unresolved reference: socketTimeoutMillis
+exception:             socketTimeoutMillis = 10_000
+exception:             ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:42:9: error: unresolved reference: defaultRequest
+exception:         defaultRequest {
+exception:         ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:43:13: error: unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+exception: public fun HttpRequestBuilder.url(block: URLBuilder.() -> Unit): Unit defined in io.ktor.client.request
+exception: public fun HttpRequestBuilder.url(url: Url): Unit defined in io.ktor.client.request
+exception: public fun HttpRequestBuilder.url(url: URL): URLBuilder defined in io.ktor.client.request
+exception: public fun HttpRequestBuilder.url(urlString: String): Unit defined in io.ktor.client.request
+exception: public fun HttpRequestBuilder.url(scheme: String? = ..., host: String? = ..., port: Int? = ..., path: String? = ..., block: URLBuilder.() -> Unit = ...): Unit defined in io.ktor.client.request
+exception:             url(BASE_URL)
+exception:             ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:44:13: error: unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+exception: public fun HttpMessage.contentType(): ContentType? defined in io.ktor.http
+exception: public fun HttpMessageBuilder.contentType(): ContentType? defined in io.ktor.http
+exception: public fun HttpMessageBuilder.contentType(type: ContentType): Unit defined in io.ktor.http
+exception:             contentType(ContentType.Application.Json)
+exception:             ^
+exception: composeApp\src\androidMain\kotlin\com\lumariq\android\NetworkClient.kt:45:13: error: unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+exception: public fun HttpMessageBuilder.accept(contentType: ContentType): Unit defined in io.ktor.client.request
+exception:             accept(ContentType.Application.Json)
+exception:             ^
+
+> Task :composeApp:compileDebugKotlinAndroid FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':composeApp:compileDebugKotlinAndroid'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 8m 42s
+28 actionable tasks: 28 executed
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ clear
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ bash -lc '
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT/apps/native-mobile"
+
+TS="$(date +%Y%m%d_%H%M%S)"
+mkdir -p _bak
+
+NC="composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt"
+GP="gradle.properties"
+
+cp "$NC" "_bak/NetworkClient.kt.$TS"
+
+# -------- Patch NetworkClient.kt (Ktor 2.x correct imports/plugins) --------
+cat > "$NC" << '"'"'EOF'"'"'
+package com.lumariq.android
+
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.defaultRequest.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class TransferReq(val recipient: String, val amount: Double)
+
+@Serializable
+data class TransferResp(val status: String, val txId: String, val message: String)
+
+object NetworkClient {
+    // Emulator -> host machine
+    private const val BASE_URL = "http://10.0.2.2:8080"
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        explicitNulls = false
+    }
+
+    private val client = HttpClient(OkHttp) {
+        expectSuccess = false
+
+        install(ContentNegotiation) {
+            json(json)
+        }
+
+        install(HttpTimeout) {
+            connectTimeoutMillis = 5_000            requestTimeoutMillis = 10_000            socketTimeoutMillis = 10_000        }        // Ktor 2.x: DefaultRequest plugin        install(DefaultRequest) {            url(BASE_URL)            contentType(ContentType.Application.Json)            accept(ContentType.Application.Json)        }    }    suspend fun check(): String =        runCatching { client.get("/").bodyAsText() }            .getOrElse { e -> "OFFLINE: ${e.message}" }    suspend fun executeTransfer(recipient: String, amount: Double): TransferResp {        return runCatching {[7m            val response: HttpResponse = client.post("/transfer") {[27m[7m                setBody(TransferReq(recipient, amount))[27m[7m            }[27m[7m            val text = response.bodyAsText()[27m[7m            if (!response.status.isSuccess()) {[27m[7m                TransferResp([27m[7m                    status = "ERROR",[27m[7m                    txId = "000",[27m[7m                    message = "HTTP ${response.status.value}: $text"[27m[7m                )[27m[7m            } else {[27m[7m                runCatching { json.decodeFromString(TransferResp.serializer(), text) }[27m[7m                    .getOrElse {[27m[7m                        TransferResp([27m[7m                            status = "ERROR",[27m[7m                            txId = "000",[27m[7m                            message = "Bad JSON: $text"[27m[7m                        )[27m[7m                    }[27m[7m            }[27m[7m        }.getOrElse { e ->[27m[7m            TransferResp("ERROR", "000", e.message ?: "Network Failure")[27m[7m        }[27m[7m    }[27m[7m}[27m[7mEOF[27m[7mecho "✅ Patched: $NC (Ktor imports/plugins fixed)"[27m[7mecho "✅ Backup: _bak/NetworkClient.kt.$TS"[27m[7m# -------- Harden Gradle (safe appends only) --------[27m[7mtouch "$GP"[27m[7madd_line() {[27m[7m  local line="$1"[27m[7m  grep -qF "$line" "$GP" || echo "$line" >> "$GP"[27m[7m}[27m[7m# Silence disabled iOS target warning on Windows[27m[7madd_line "kotlin.native.ignoreDisabledTargets=true"[27m[7m# Avoid flaky Kotlin compile daemon on Windows[27m[7madd_line "kotlin.compiler.execution.strategy=in-process"[27m[7mecho "✅ Updated: $GP"[27m[7m# -------- Rebuild + install --------[27m[7m./gradlew --stop || true[27m[7m./gradlew :composeApp:installDebug --no-daemon --rerun-tasks[27m[7mecho "✅ DONE"[27m[7m'[27m            val response: HttpResponse = client.post("/transfer") {                setBody(TransferReq(recipient, amount))            }            val text = response.bodyAsText()            if (!response.status.isSuccess()) {                TransferResp(                    status = "ERROR",                    txId = "000",                    message = "HTTP ${response.status.value}: $text"                )            } else {                runCatching { json.decodeFromString(TransferResp.serializer(), text) }                    .getOrElse {                        TransferResp(                            status = "ERROR",                            txId = "000",                            message = "Bad JSON: $text"                        )                    }            }        }.getOrElse { e ->            TransferResp("ERROR", "000", e.message ?: "Network Failure")        }    }}EOFecho "✅ Patched: $NC (Ktor imports/plugins fixed)"echo "✅ Backup: _bak/NetworkClient.kt.$TS"# -------- Harden Gradle (safe appends only) --------touch "$GP"add_line() {  local line="$1"  grep -qF "$line" "$GP" || echo "$line" >> "$GP"}# Silence disabled iOS target warning on Windowsadd_line "kotlin.native.ignoreDisabledTargets=true"# Avoid flaky Kotlin compile daemon on Windowsadd_line "kotlin.compiler.execution.strategy=in-process"echo "✅ Updated: $GP"# -------- Rebuild + install --------./gradlew --stop || true./gradlew :composeApp:installDebug --no-daemon --rerun-tasksecho "✅ DONE"'
+[?2004l✅ Patched: composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt (Ktor imports/plugins fixed)
+✅ Backup: _bak/NetworkClient.kt.20260111_121714
+✅ Updated: gradle.properties
+No Gradle daemons are running.
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors
+> Task :composeApp:generateComposeResClass
+> Task :composeApp:preBuild UP-TO-DATE
+> Task :composeApp:preDebugBuild UP-TO-DATE
+> Task :composeApp:generateDebugResValues
+> Task :composeApp:mapDebugSourceSetPaths
+> Task :composeApp:generateDebugResources
+> Task :composeApp:checkDebugAarMetadata
+> Task :composeApp:packageDebugResources
+> Task :composeApp:createDebugCompatibleScreenManifests
+> Task :composeApp:extractDeepLinksDebug
+> Task :composeApp:parseDebugLocalResources
+> Task :composeApp:mergeDebugResources
+> Task :composeApp:processDebugMainManifest
+> Task :composeApp:processDebugManifest
+> Task :composeApp:javaPreCompileDebug
+> Task :composeApp:mergeDebugShaders
+> Task :composeApp:compileDebugShaders NO-SOURCE
+> Task :composeApp:copyDebugFontsToAndroidAssets
+> Task :composeApp:generateDebugAssets UP-TO-DATE
+> Task :composeApp:mergeDebugAssets
+> Task :composeApp:compressDebugAssets
+> Task :composeApp:desugarDebugFileDependencies
+> Task :composeApp:mergeDebugJniLibFolders
+> Task :composeApp:mergeDebugNativeLibs NO-SOURCE
+> Task :composeApp:stripDebugDebugSymbols NO-SOURCE
+> Task :composeApp:checkDebugDuplicateClasses
+> Task :composeApp:validateSigningDebug
+> Task :composeApp:writeDebugAppMetadata
+> Task :composeApp:writeDebugSigningConfigVersions
+> Task :composeApp:processDebugManifestForPackage
+> Task :composeApp:mergeLibDexDebug
+> Task :composeApp:processDebugResources
+> Task :composeApp:mergeExtDexDebug
+> Task :composeApp:compileDebugKotlinAndroid
+e: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt:6:31 Unresolved reference: defaultRequest
+
+> Task :composeApp:compileDebugKotlinAndroid FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':composeApp:compileDebugKotlinAndroid'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 4m 26s
+28 actionable tasks: 28 executed
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ cleart
+[?2004lbash: cleart: command not found
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ clear[?5h[?5l
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ bash -lc '
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT/apps/native-mobile"
+
+TS="$(date +%Y%m%d_%H%M%S)"
+mkdir -p _bak
+
+NC="composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt"
+cp "$NC" "_bak/NetworkClient.kt.$TS"
+
+cat > "$NC" << '"'"'EOF'"'"'
+package com.lumariq.android
+
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class TransferReq(val recipient: String, val amount: Double)
+
+@Serializable
+data class TransferResp(val status: String, val txId: String, val message: String)
+
+object NetworkClient {
+    // Emulator -> host machine
+    private const val BASE_URL = "http://10.0.2.2:8080"
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        explicitNulls = false
+    }
+
+    private val client = HttpClient(OkHttp) {
+        expectSuccess = false
+
+[7m        install(ContentNegotiation) {[27m
+[7m            json(json)[27m
+[7m        }[27m
+
+[7m        install(HttpTimeout) {[27m
+[7m            connectTimeoutMillis = 5_000[27m
+[7m            requestTimeoutMillis = 10_000[27m
+[7m            socketTimeoutMillis = 10_000[27m
+[7m        }[27m
+[7m    }[27m[7m    suspend fun check(): String =[27m[7m        runCatching { client.get("$BASE_URL/").bodyAsText() }[27m[7m            .getOrElse { e -> "OFFLINE: ${e.message}" }[27m[7m    suspend fun executeTransfer(recipient: String, amount: Double): TransferResp {[27m[7m        return runCatching {[27m[7m            val response: HttpResponse = client.post("$BASE_URL/transfer") {[27m[7m                contentType(ContentType.Application.Json)[27m[7m                accept(ContentType.Application.Json)[27m[7m                setBody(TransferReq(recipient, amount))[27m[7m            }[27m[7m            val text = response.bodyAsText()[27m[7m            if (!response.status.isSuccess()) {[27m[7m                TransferResp([27m[7m                    status = "ERROR",[27m[7m                    txId = "000",[27m[7m                    message = "HTTP ${response.status.value}: $text"[27m[7m                )[27m[7m            } else {[27m[7m                runCatching { json.decodeFromString(TransferResp.serializer(), text) }[27m[7m                    .getOrElse {[27m[7m                        TransferResp([27m[7m                            status = "ERROR",[27m[7m                            txId = "000",[27m[7m                            message = "Bad JSON: $text"[27m[7m                        )[27m[7m                    }[27m[7m            }[27m[7m        }.getOrElse { e ->[27m[7m            TransferResp("ERROR", "000", e.message ?: "Network Failure")[27m[7m        }[27m[7m    }[27m[7m}[27m[7mEOF[27m[7mecho "✅ Fixed NetworkClient (removed DefaultRequest plugin usage)"[27m[7mecho "✅ Backup: _bak/NetworkClient.kt.$TS"[27m[7m./gradlew :composeApp:installDebug --no-daemon --rerun-tasks[27m[7m'[27m[A[A[A[A[A[A[A[A[A        install(ContentNegotiation) {
+            json(json)
+        }
+
+        install(HttpTimeout) {
+            connectTimeoutMillis = 5_000
+            requestTimeoutMillis = 10_000
+            socketTimeoutMillis = 10_000
+        }
+    }    suspend fun check(): String =        runCatching { client.get("$BASE_URL/").bodyAsText() }            .getOrElse { e -> "OFFLINE: ${e.message}" }    suspend fun executeTransfer(recipient: String, amount: Double): TransferResp {        return runCatching {            val response: HttpResponse = client.post("$BASE_URL/transfer") {                contentType(ContentType.Application.Json)                accept(ContentType.Application.Json)                setBody(TransferReq(recipient, amount))            }            val text = response.bodyAsText()            if (!response.status.isSuccess()) {                TransferResp(                    status = "ERROR",                    txId = "000",                    message = "HTTP ${response.status.value}: $text"                )            } else {                runCatching { json.decodeFromString(TransferResp.serializer(), text) }                    .getOrElse {                        TransferResp(                            status = "ERROR",                            txId = "000",                            message = "Bad JSON: $text"                        )                    }            }        }.getOrElse { e ->            TransferResp("ERROR", "000", e.message ?: "Network Failure")        }    }}EOFecho "✅ Fixed NetworkClient (removed DefaultRequest plugin usage)"echo "✅ Backup: _bak/NetworkClient.kt.$TS"./gradlew :composeApp:installDebug --no-daemon --rerun-tasks'
+[?2004l✅ Fixed NetworkClient (removed DefaultRequest plugin usage)
+✅ Backup: _bak/NetworkClient.kt.20260111_122759
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors
+> Task :composeApp:generateComposeResClass
+> Task :composeApp:preBuild UP-TO-DATE
+> Task :composeApp:preDebugBuild UP-TO-DATE
+> Task :composeApp:generateDebugResValues
+> Task :composeApp:checkDebugAarMetadata
+> Task :composeApp:mapDebugSourceSetPaths
+> Task :composeApp:generateDebugResources
+> Task :composeApp:packageDebugResources
+> Task :composeApp:createDebugCompatibleScreenManifests
+> Task :composeApp:extractDeepLinksDebug
+> Task :composeApp:parseDebugLocalResources
+> Task :composeApp:mergeDebugResources
+> Task :composeApp:processDebugMainManifest
+> Task :composeApp:processDebugManifest
+> Task :composeApp:javaPreCompileDebug
+> Task :composeApp:mergeDebugShaders
+> Task :composeApp:compileDebugShaders NO-SOURCE
+> Task :composeApp:copyDebugFontsToAndroidAssets
+> Task :composeApp:generateDebugAssets UP-TO-DATE
+> Task :composeApp:mergeDebugAssets
+> Task :composeApp:processDebugManifestForPackage
+> Task :composeApp:compressDebugAssets
+> Task :composeApp:desugarDebugFileDependencies
+> Task :composeApp:mergeDebugJniLibFolders
+> Task :composeApp:mergeDebugNativeLibs NO-SOURCE
+> Task :composeApp:stripDebugDebugSymbols NO-SOURCE
+> Task :composeApp:validateSigningDebug
+> Task :composeApp:writeDebugAppMetadata
+> Task :composeApp:checkDebugDuplicateClasses
+> Task :composeApp:writeDebugSigningConfigVersions
+> Task :composeApp:mergeLibDexDebug
+> Task :composeApp:processDebugResources
+> Task :composeApp:mergeExtDexDebug
+> Task :composeApp:compileDebugKotlinAndroid
+w: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt:27:9 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/SensorySystem.kt:12:47 'VIBRATOR_SERVICE: String' is deprecated. Deprecated in Java
+w: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/Subsystems.kt:33:36 Parameter 'sensory' is never used
+
+> Task :composeApp:compileDebugJavaWithJavac NO-SOURCE
+> Task :composeApp:dexBuilderDebug
+> Task :composeApp:mergeDebugGlobalSynthetics
+> Task :composeApp:processDebugJavaRes
+> Task :composeApp:mergeProjectDexDebug
+> Task :composeApp:mergeDebugJavaResource
+> Task :composeApp:packageDebug
+> Task :composeApp:createDebugApkListingFileRedirect
+
+> Task :composeApp:installDebug
+Installing APK 'composeApp-debug.apk' on 'Pixel_7(AVD) - 15' for :composeApp:debug
+Installed on 1 device.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 56s
+36 actionable tasks: 36 executed
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7madb shell am force-stop com.lumariq.android[27m
+[7madb shell monkey -p com.lumariq.android -c android.intent.category.LAUNCHER 1[27m[A[C[Cadb shell am force-stop com.lumariq.android
+adb shell monkey -p com.lumariq.android -c android.intent.category.LAUNCHER 1
+[?2004l  bash arg: -p
+  bash arg: com.lumariq.android
+  bash arg: -c
+  bash arg: android.intent.category.LAUNCHER
+  bash arg: 1
+args: [-p, com.lumariq.android, -c, android.intent.category.LAUNCHER, 1]
+ arg: "-p"
+ arg: "com.lumariq.android"
+ arg: "-c"
+ arg: "android.intent.category.LAUNCHER"
+ arg: "1"
+data="com.lumariq.android"
+data="android.intent.category.LAUNCHER"
+Events injected: 1
+## Network stats: elapsed time=765ms (0ms mobile, 0ms wifi, 765ms not connected)
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mcurl -i http://localhost:8080/[27m
+[7mcurl -i -X POST http://localhost:8080/transfer -H "Content-Type: application/json" -d "{\"recipient\":\"test\",\"amount\":1}"[27m[A[C[Ccurl -i http://localhost:8080/
+curl -i -X POST http://localhost:8080/transfer -H "Content-Type: application/json" -d "{\"recipient\":\"test\",\"amount\":1}"
+[?2004l  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0   0     0   0     0     0     0  --:--:-- --:--:-- --:--:--     0  0     0   0     0   0     0     0     0  --:--:--  0:00:01 --:--:--     0  0     0   0     0   0     0     0     0  --:--:--  0:00:02 --:--:--     0  0     0   0     0   0     0     0     0  --:--:--  0:00:02 --:--:--     0
+curl: (7) Failed to connect to localhost port 8080 after 2232 ms: Could not connect to server
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0   0     0   0     0     0     0  --:--:-- --:--:-- --:--:--     0  0     0   0     0   0     0     0     0  --:--:--  0:00:01 --:--:--     0  0     0   0     0   0     0     0     0  --:--:--  0:00:02 --:--:--     0  0     0   0     0   0     0     0     0  --:--:--  0:00:02 --:--:--     0
+curl: (7) Failed to connect to localhost port 8080 after 2236 ms: Could not connect to server
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ CLEAR
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mbash -lc '[27m
+[7mset -euo pipefail[27m
+
+[7mROOT="$(git rev-parse --show-toplevel)"[27m
+[7mcd "$ROOT/apps/native-mobile"[27m
+
+[7mecho "📍 Repo: $ROOT"[27m
+
+[7m# -------------------------------------------------[27m
+[7m# 1) Network Security Config (dev-only cleartext)[27m
+[7m# -------------------------------------------------[27m
+[7mmkdir -p composeApp/src/androidMain/res/xml[27m
+
+[7mcat > composeApp/src/androidMain/res/xml/network_security_config.xml <<EOF[27m
+[7m<?xml version="1.0" encoding="utf-8"?>[27m
+[7m<network-security-config>[27m
+[7m    <domain-config cleartextTrafficPermitted="true">[27m
+[7m        <domain includeSubdomains="true">10.0.2.2</domain>[27m
+[7m        <domain includeSubdomains="true">localhost</domain>[27m
+[7m    </domain-config>[27m
+[7m</network-security-config>[27m
+[7mEOF[27m
+
+[7mecho "✅ network_security_config.xml written"[27m
+
+[7m# -------------------------------------------------[27m
+[7m# 2) Patch AndroidManifest.xml (idempotent)[27m
+[7m# -------------------------------------------------[27m
+[7mMAN="composeApp/src/androidMain/AndroidManifest.xml"[27m
+
+[7mgrep -q "android:networkSecurityConfig" "$MAN" || \[27m
+[7msed -i "s/<application /<application android:networkSecurityConfig=\"@xml\\/network_security_config\" /" "$MAN"[27m
+
+[7mgrep -q "android:usesCleartextTraffic" "$MAN" || \[27m
+[7msed -i "s/<application /<application android:usesCleartextTraffic=\"true\" /" "$MAN"[27m
+
+[7mecho "✅ AndroidManifest.xml patched"[27m
+
+[7m# -------------------------------------------------[27m
+[7m# 3) Force clean reinstall so emulator uses fix[27m
+[7m# -------------------------------------------------[27m
+[7m./gradlew --stop || true[27m
+[7m./gradlew :composeApp:installDebug --no-daemon --rerun-tasks[27m
+
+[7mecho "🚀 DONE — Cleartext enabled + app reinstalled"[27m
+[7m'[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[Cbash -lc '
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT/apps/native-mobile"
+
+echo "📍 Repo: $ROOT"
+
+# -------------------------------------------------
+# 1) Network Security Config (dev-only cleartext)
+# -------------------------------------------------
+mkdir -p composeApp/src/androidMain/res/xml
+
+cat > composeApp/src/androidMain/res/xml/network_security_config.xml <<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>
+EOF
+
+echo "✅ network_security_config.xml written"
+
+# -------------------------------------------------
+# 2) Patch AndroidManifest.xml (idempotent)
+# -------------------------------------------------
+MAN="composeApp/src/androidMain/AndroidManifest.xml"
+
+grep -q "android:networkSecurityConfig" "$MAN" || \
+sed -i "s/<application /<application android:networkSecurityConfig=\"@xml\\/network_security_config\" /" "$MAN"
+
+grep -q "android:usesCleartextTraffic" "$MAN" || \
+sed -i "s/<application /<application android:usesCleartextTraffic=\"true\" /" "$MAN"
+
+echo "✅ AndroidManifest.xml patched"
+
+# -------------------------------------------------
+# 3) Force clean reinstall so emulator uses fix
+# -------------------------------------------------
+./gradlew --stop || true
+./gradlew :composeApp:installDebug --no-daemon --rerun-tasks
+
+echo "🚀 DONE — Cleartext enabled + app reinstalled"
+'
+[?2004l📍 Repo: C:/Users/slick/lumariq
+✅ network_security_config.xml written
+✅ AndroidManifest.xml patched
+No Gradle daemons are running.
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors
+> Task :composeApp:generateComposeResClass
+> Task :composeApp:preBuild UP-TO-DATE
+> Task :composeApp:preDebugBuild UP-TO-DATE
+> Task :composeApp:generateDebugResValues
+> Task :composeApp:mapDebugSourceSetPaths
+> Task :composeApp:generateDebugResources
+> Task :composeApp:checkDebugAarMetadata
+> Task :composeApp:packageDebugResources
+> Task :composeApp:createDebugCompatibleScreenManifests
+> Task :composeApp:extractDeepLinksDebug
+> Task :composeApp:parseDebugLocalResources
+> Task :composeApp:mergeDebugResources
+> Task :composeApp:processDebugMainManifest
+> Task :composeApp:processDebugManifest
+> Task :composeApp:javaPreCompileDebug
+> Task :composeApp:mergeDebugShaders
+> Task :composeApp:compileDebugShaders NO-SOURCE
+> Task :composeApp:copyDebugFontsToAndroidAssets
+> Task :composeApp:generateDebugAssets UP-TO-DATE
+> Task :composeApp:mergeDebugAssets
+> Task :composeApp:compressDebugAssets
+> Task :composeApp:desugarDebugFileDependencies
+> Task :composeApp:mergeDebugJniLibFolders
+> Task :composeApp:mergeDebugNativeLibs NO-SOURCE
+> Task :composeApp:stripDebugDebugSymbols NO-SOURCE
+> Task :composeApp:validateSigningDebug
+> Task :composeApp:writeDebugAppMetadata
+> Task :composeApp:writeDebugSigningConfigVersions
+> Task :composeApp:processDebugManifestForPackage
+> Task :composeApp:checkDebugDuplicateClasses
+> Task :composeApp:mergeLibDexDebug
+> Task :composeApp:processDebugResources
+> Task :composeApp:mergeExtDexDebug
+> Task :composeApp:compileDebugKotlinAndroid
+w: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/NetworkClient.kt:27:9 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/SensorySystem.kt:12:47 'VIBRATOR_SERVICE: String' is deprecated. Deprecated in Java
+w: file:///C:/Users/slick/lumariq/apps/native-mobile/composeApp/src/androidMain/kotlin/com/lumariq/android/Subsystems.kt:33:36 Parameter 'sensory' is never used
+
+> Task :composeApp:compileDebugJavaWithJavac NO-SOURCE
+> Task :composeApp:dexBuilderDebug
+> Task :composeApp:mergeDebugGlobalSynthetics
+> Task :composeApp:processDebugJavaRes
+> Task :composeApp:mergeProjectDexDebug
+> Task :composeApp:mergeDebugJavaResource
+> Task :composeApp:packageDebug
+> Task :composeApp:createDebugApkListingFileRedirect
+
+> Task :composeApp:installDebug
+Installing APK 'composeApp-debug.apk' on 'Pixel_7(AVD) - 15' for :composeApp:debug
+Installed on 1 device.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 7m 11s
+36 actionable tasks: 36 executed
+🚀 DONE — Cleartext enabled + app reinstalled
+[?2004h]0;MINGW64:/c/Users/slick/lumariq/apps/native-mobile
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq/apps/native-mobile[36m (main)[0m
+$ [7mcd /c/Users/slick/lumariq[27m
+[7m./gradlew :backend-server:run --no-daemon[27m[A[C[Ccd /c/Users/slick/lumariq
+./gradlew :backend-server:run --no-daemon
+[?2004lbash: ./gradlew: No such file or directory
+[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ [7m./gradlew projects --no-daemon[27m[C[C./gradlew projects --no-daemon
+[?2004lbash: ./gradlew: No such file or directory
+[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ CLEAR
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ bash -lc '
+set -euo pipefail
+
+START="$(pwd)"
+echo "📍 Start: $START"
+
+[7m# Find nearest Gradle root (settings.gradle or settings.gradle.kts)[27m
+[7mSFILE="$(find . -maxdepth 6 -type f \( -name "settings.gradle.kts" -o -name "settings.gradle" \) \[27m
+[7m  -not -path "*/.git/*" -not -path "*/build/*" -not -path "*/.gradle/*" \[27m
+[7m  | head -n 1)"[27m
+
+[7mif [[ -z "${SFILE:-}" ]]; then[27m
+[7m  echo "❌ No settings.gradle(.kts) found within 6 levels from: $START"[27m
+[7m  echo "➡️ cd into the repo folder and rerun."[27m
+[7m  exit 1[27m
+[7mfi[27m
+
+[7mROOT="$(cd "$(dirname "$SFILE")" && pwd)"[27m
+[7mecho "✅ Gradle root: $ROOT"[27m
+[7mcd "$ROOT"[27m
+
+[7m# Locate gradlew[27m
+[7mif [[ ! -f "./gradlew" ]]; then[27m
+[7m  echo "❌ gradlew not found at Gradle root: $ROOT"[27m
+[7m  echo "➡️ Listing candidates:"[27m
+[7m  find . -maxdepth 4 -type f -name "gradlew" -print[27m
+[7m  exit 1[27m
+[7mfi[27m
+
+[7mchmod +x ./gradlew || true[27m
+
+[7mecho "========================================"[27m
+[7mecho "📦 Gradle projects:"[27m
+[7mecho "========================================"[27m
+[7m./gradlew projects --no-daemon[27m
+
+[7mecho[27m
+[7mecho "========================================"[27m
+[7mecho "🚀 Trying to run backend candidates..."[27m
+[7mecho "========================================"[27m
+
+[7m# Try common backend modules/tasks (first one that exists will run)[27m
+[7mCANDIDATES=([27m
+[7m  ":backend-server:run"[27m
+[7m  ":backend:run"[27m
+[7m  ":server:run"[27m
+[7m  ":services:run"[27m
+[7m)[27m
+
+[7mfor t in "${CANDIDATES[@]}"; do[27m
+[7m  if ./gradlew -q tasks --all --no-daemon | grep -q "${t#*:}"; then[27m
+[7m    echo "✅ Running: ./gradlew $t --no-daemon"[27m
+[7m    exec ./gradlew "$t" --no-daemon[27m
+[7m  fi[27m
+[7mdone[27m[7mecho "❌ Could not find a backend :run task from common modules."[27m[7mecho "➡️ Search for run tasks containing 'run' + 'ktor' + 'server':"[27m[7m./gradlew -q tasks --all --no-daemon | grep -iE "run|ktor|server" || true[27m[7m'[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A# Find nearest Gradle root (settings.gradle or settings.gradle.kts)
+SFILE="$(find . -maxdepth 6 -type f \( -name "settings.gradle.kts" -o -name "settings.gradle" \) \
+  -not -path "*/.git/*" -not -path "*/build/*" -not -path "*/.gradle/*" \
+  | head -n 1)"
+
+if [[ -z "${SFILE:-}" ]]; then
+  echo "❌ No settings.gradle(.kts) found within 6 levels from: $START"
+  echo "➡️ cd into the repo folder and rerun."
+  exit 1
+fi
+
+ROOT="$(cd "$(dirname "$SFILE")" && pwd)"
+echo "✅ Gradle root: $ROOT"
+cd "$ROOT"
+
+# Locate gradlew
+if [[ ! -f "./gradlew" ]]; then
+  echo "❌ gradlew not found at Gradle root: $ROOT"
+  echo "➡️ Listing candidates:"
+  find . -maxdepth 4 -type f -name "gradlew" -print
+  exit 1
+fi
+
+chmod +x ./gradlew || true
+
+echo "========================================"
+echo "📦 Gradle projects:"
+echo "========================================"
+./gradlew projects --no-daemon
+
+echo
+echo "========================================"
+echo "🚀 Trying to run backend candidates..."
+echo "========================================"
+
+# Try common backend modules/tasks (first one that exists will run)
+CANDIDATES=(
+  ":backend-server:run"
+  ":backend:run"
+  ":server:run"
+  ":services:run"
+)
+
+for t in "${CANDIDATES[@]}"; do
+  if ./gradlew -q tasks --all --no-daemon | grep -q "${t#*:}"; then
+    echo "✅ Running: ./gradlew $t --no-daemon"
+    exec ./gradlew "$t" --no-daemon
+  fi
+doneecho "❌ Could not find a backend :run task from common modules."echo "➡️ Search for run tasks containing 'run' + 'ktor' + 'server':"./gradlew -q tasks --all --no-daemon | grep -iE "run|ktor|server" || true'
+[?2004l📍 Start: /c/Users/slick/lumariq
+✅ Gradle root: /c/Users/slick/lumariq/apps/native-mobile
+========================================
+📦 Gradle projects:
+========================================
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :projects
+
+------------------------------------------------------------
+Root project 'LumariqMobile'
+------------------------------------------------------------
+
+Root project 'LumariqMobile'
++--- Project ':composeApp'
+\--- Project ':shared'
+
+To see a list of the tasks of a project, run gradlew <project-path>:tasks
+For example, try running gradlew :composeApp:tasks
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 18s
+1 actionable task: 1 executed
+
+========================================
+🚀 Trying to run backend candidates...
+========================================
+❌ Could not find a backend :run task from common modules.
+➡️ Search for run tasks containing run + ktor + server:
+Tasks runnable from root project 'LumariqMobile'
+tasks - Displays the tasks runnable from root project 'LumariqMobile' (some of the displayed tasks may belong to subprojects).
+composeApp:tasks - Displays the tasks runnable from project ':composeApp'.
+shared:tasks - Displays the tasks runnable from project ':shared'.
+runCommonizer - [Deprecated: Use 'commonize' instead]
+shared:runCommonizer - [Deprecated: Use 'commonize' instead]
+shared:allTests - Runs the tests for all targets and create aggregated report
+composeApp:check - Runs all checks.
+shared:check - Runs all checks.
+composeApp:checkKotlinGradlePluginConfigurationErrors - Checks that Kotlin Gradle Plugin hasn't reported project configuration errors, failing otherwise. This task always runs before compileKotlin* or similar tasks.
+shared:checkKotlinGradlePluginConfigurationErrors - Checks that Kotlin Gradle Plugin hasn't reported project configuration errors, failing otherwise. This task always runs before compileKotlin* or similar tasks.
+composeApp:connectedAndroidTest - Installs and runs instrumentation tests for all flavors on connected devices.
+shared:connectedAndroidTest - Installs and runs instrumentation tests for all flavors on connected devices.
+composeApp:connectedCheck - Runs all device checks on currently connected devices.
+shared:connectedCheck - Runs all device checks on currently connected devices.
+composeApp:connectedDebugAndroidTest - Installs and runs the tests for debug on connected devices.
+shared:connectedDebugAndroidTest - Installs and runs the tests for debug on connected devices.
+composeApp:deviceAndroidTest - Installs and runs instrumentation tests using all Device Providers.
+shared:deviceAndroidTest - Installs and runs instrumentation tests using all Device Providers.
+composeApp:deviceCheck - Runs all device checks using Device Providers and Test Servers.
+shared:deviceCheck - Runs all device checks using Device Providers and Test Servers.
+composeApp:lint - Runs lint on the default variant.
+shared:lint - Runs lint on the default variant.
+composeApp:lintFix - Runs lint on the default variant and applies any safe suggestions to the source code.
+shared:lintFix - Runs lint on the default variant and applies any safe suggestions to the source code.
+composeApp:test - Run unit tests for all variants.
+shared:test - Run unit tests for all variants.
+composeApp:testDebugUnitTest - Run unit tests for the debug build.
+shared:testDebugUnitTest - Run unit tests for the debug build.
+composeApp:testReleaseUnitTest - Run unit tests for the release build.
+shared:testReleaseUnitTest - Run unit tests for the release build.
+composeApp:bundleDebugClassesToRuntimeJar
+shared:bundleLibRuntimeToDirDebug
+shared:bundleLibRuntimeToDirRelease
+shared:bundleLibRuntimeToJarDebug
+shared:bundleLibRuntimeToJarRelease
+composeApp:bundleReleaseClassesToRuntimeJar
+composeApp:lintAnalyzeDebug - Run lint analysis on the debug variant
+shared:lintAnalyzeDebug - Run lint analysis on the debug variant
+composeApp:lintAnalyzeRelease - Run lint analysis on the release variant
+shared:lintAnalyzeRelease - Run lint analysis on the release variant
+composeApp:lintReportDebug - Run lint on the debug variant
+shared:lintReportDebug - Run lint on the debug variant
+composeApp:lintReportRelease - Run lint on the release variant
+shared:lintReportRelease - Run lint on the release variant
+shared:lintVitalAnalyzeDebug - Run lint analysis with only the fatal issues enabled on the debug variant
+composeApp:lintVitalAnalyzeRelease - Run lint analysis with only the fatal issues enabled on the release variant
+shared:lintVitalAnalyzeRelease - Run lint analysis with only the fatal issues enabled on the release variant
+composeApp:lintVitalReportRelease - Run lint with only the fatal issues enabled on the release variant
+prepareKotlinIdeaImport - Umbrella for all tasks required to run before IDEA/Gradle import
+composeApp:prepareKotlinIdeaImport - Umbrella for all tasks required to run before IDEA/Gradle import
+shared:prepareKotlinIdeaImport - Umbrella for all tasks required to run before IDEA/Gradle import
+[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ CLEAR
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ bash -lc '
+set -euo pipefail
+
+cd /c/Users/slick/lumariq
+
+echo "🔎 Searching for backend candidates (Ktor)..."
+
+# Find folders containing settings.gradle(.kts) excluding mobile build
+mapfile -t SETTINGS < <(find . -maxdepth 6 -type f \( -name "settings.gradle.kts" -o -name "settings.gradle" \) \
+  -not -path "*/apps/native-mobile/*" -not -path "*/.git/*" -print)
+
+if [[ ${#SETTINGS[@]} -eq 0 ]]; then
+  echo "❌ No other Gradle projects found besides apps/native-mobile."
+[7m  echo "➡️ If backend exists, it may be outside this repo folder or not a Gradle project."[27m
+[7m  exit 1[27m
+[7mfi[27m
+
+[7m# Score candidates by presence of Ktor markers[27m
+[7mbest=""[27m
+[7mbestScore=0[27m
+
+[7mfor s in "${SETTINGS[@]}"; do[27m
+[7m  dir="$(cd "$(dirname "$s")" && pwd)"[27m
+[7m  score=0[27m
+[7m  [[ -f "$dir/gradlew" ]] && ((score+=2))[27m
+[7m  find "$dir" -maxdepth 6 -type f -name "Application.kt" | grep -qi . && ((score+=3))[27m
+[7m  find "$dir" -maxdepth 6 -type f -name "application.conf" -o -name "application.yml" -o -name "application.yaml" | grep -qi . && ((score+=2))[27m
+[7m  find "$dir" -maxdepth 6 -type f -name "build.gradle.kts" -o -name "build.gradle" | xargs -I{} grep -i "ktor-server" {} >/dev/null 2>&1 && ((score+=3)) || true[27m
+
+[7m  echo "  • Candidate: $dir (score=$score)"[27m
+[7m  if (( score > bestScore )); then[27m
+[7m    bestScore=$score[27m
+[7m    best="$dir"[27m
+[7m  fi[27m
+[7mdone[27m
+
+[7mif [[ -z "$best" ]]; then[27m
+[7m  echo "❌ Could not choose a backend candidate."[27m
+[7m  exit 1[27m
+[7mfi[27m
+
+[7mecho[27m
+[7mecho "✅ Selected backend Gradle root: $best (score=$bestScore)"[27m
+[7mcd "$best"[27m
+
+[7mchmod +x ./gradlew || true[27m
+
+[7mecho[27m
+[7mecho "📦 Projects:"[27m
+[7m./gradlew projects --no-daemon[27m
+
+[7mecho[27m
+[7mecho "🔎 Looking for runnable server tasks..."[27m
+[7m./gradlew -q tasks --all --no-daemon | grep -iE "run|server|application" || true[27m[7mecho[27m[7mecho "🚀 Trying common run tasks..."[27m[7mfor t in run :run :application:run :server:run :backend:run :backend-server:run; do[27m[7m  if ./gradlew -q tasks --all --no-daemon | grep -qE "(^|:)${t#*:}(\s|$)"; then[27m[7m    echo "✅ Running: ./gradlew $t --no-daemon"[27m[7m    exec ./gradlew $t --no-daemon[27m[7m  fi[27m[7mdone[27m[7mecho "❌ No obvious run task found. Run:"[27m[7mecho "   ./gradlew :<module>:tasks --no-daemon"[27m[7m'[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A  echo "➡️ If backend exists, it may be outside this repo folder or not a Gradle project."
+  exit 1
+fi
+
+# Score candidates by presence of Ktor markers
+best=""
+bestScore=0
+
+for s in "${SETTINGS[@]}"; do
+  dir="$(cd "$(dirname "$s")" && pwd)"
+  score=0
+  [[ -f "$dir/gradlew" ]] && ((score+=2))
+  find "$dir" -maxdepth 6 -type f -name "Application.kt" | grep -qi . && ((score+=3))
+  find "$dir" -maxdepth 6 -type f -name "application.conf" -o -name "application.yml" -o -name "application.yaml" | grep -qi . && ((score+=2))
+  find "$dir" -maxdepth 6 -type f -name "build.gradle.kts" -o -name "build.gradle" | xargs -I{} grep -i "ktor-server" {} >/dev/null 2>&1 && ((score+=3)) || true
+
+  echo "  • Candidate: $dir (score=$score)"
+  if (( score > bestScore )); then
+    bestScore=$score
+    best="$dir"
+  fi
+done
+
+if [[ -z "$best" ]]; then
+  echo "❌ Could not choose a backend candidate."
+  exit 1
+fi
+
+echo
+echo "✅ Selected backend Gradle root: $best (score=$bestScore)"
+cd "$best"
+
+chmod +x ./gradlew || true
+
+echo
+echo "📦 Projects:"
+./gradlew projects --no-daemon
+
+echo
+echo "🔎 Looking for runnable server tasks..."
+./gradlew -q tasks --all --no-daemon | grep -iE "run|server|application" || trueechoecho "🚀 Trying common run tasks..."for t in run :run :application:run :server:run :backend:run :backend-server:run; do  if ./gradlew -q tasks --all --no-daemon | grep -qE "(^|:)${t#*:}(\s|$)"; then    echo "✅ Running: ./gradlew $t --no-daemon"    exec ./gradlew $t --no-daemon  fidoneecho "❌ No obvious run task found. Run:"echo "   ./gradlew :<module>:tasks --no-daemon"'
+[?2004l🔎 Searching for backend candidates (Ktor)...
+  • Candidate: /c/Users/slick/lumariq/backend-server (score=7)
+  • Candidate: /c/Users/slick/lumariq (score=2)
+  • Candidate: /c/Users/slick/lumariq/_ai_context (score=3)
+
+✅ Selected backend Gradle root: /c/Users/slick/lumariq/backend-server (score=7)
+
+📦 Projects:
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :projects
+
+------------------------------------------------------------
+Root project 'lumariq-server'
+------------------------------------------------------------
+
+Root project 'lumariq-server'
+No sub-projects
+
+To see a list of the tasks of a project, run gradlew <project-path>:tasks
+For example, try running gradlew :tasks
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 4m 20s
+1 actionable task: 1 executed
+
+🔎 Looking for runnable server tasks...
+Tasks runnable from root project 'lumariq-server'
+Application tasks
+run - Runs this project as a JVM application
+runShadow - Runs this project as a JVM application using the shadow jar
+startShadowScripts - Creates OS specific scripts to run the project as a JVM application using the shadow jar
+buildEnvironment - Displays all buildscript dependencies declared in root project 'lumariq-server'.
+dependencies - Displays all dependencies declared in root project 'lumariq-server'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'lumariq-server'.
+outgoingVariants - Displays the outgoing variants of root project 'lumariq-server'.
+projects - Displays the sub-projects of root project 'lumariq-server'.
+properties - Displays the properties of root project 'lumariq-server'.
+resolvableConfigurations - Displays the configurations that can be resolved in root project 'lumariq-server'.
+tasks - Displays the tasks runnable from root project 'lumariq-server'.
+buildFatJar - Builds a combined JAR of project and runtime dependencies.
+runDocker - Builds a project's image to a Docker daemon and runs it.
+runFatJar - Builds a combined JAR of project and runtime dependencies and runs it.
+shadowJar - Create a combined JAR of project and runtime dependencies
+check - Runs all checks.
+checkKotlinGradlePluginConfigurationErrors - Checks that Kotlin Gradle Plugin hasn't reported project configuration errors, failing otherwise. This task always runs before compileKotlin* or similar tasks.
+test - Runs the test suite.
+components - Displays the components produced by root project 'lumariq-server'. [deprecated]
+dependentComponents - Displays the dependent components of components in root project 'lumariq-server'. [deprecated]
+model - Displays the configuration model of root project 'lumariq-server'. [deprecated]
+startScripts - Creates OS specific scripts to run the project as a JVM application.
+
+🚀 Trying common run tasks...
+✅ Running: ./gradlew run --no-daemon
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :compileKotlin
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+
+> Task :run
+13:31:07.814 [main] INFO ktor.application -- Autoreload is disabled because the development mode is off.
+13:31:10.503 [main] INFO ktor.application -- Application started in 2.991 seconds.
+13:31:10.547 [main] DEBUG io.netty.util.internal.logging.InternalLoggerFactory -- Using SLF4J as the default logging framework
+13:31:10.759 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- -Dio.netty.noUnsafe: false
+13:31:10.760 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- Java version: 17
+13:31:10.770 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- sun.misc.Unsafe.theUnsafe: available
+13:31:10.790 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- sun.misc.Unsafe.copyMemory: available
+13:31:10.792 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- sun.misc.Unsafe.storeFence: available
+13:31:10.795 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- java.nio.Buffer.address: available
+13:31:10.799 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- direct buffer constructor: unavailable: Reflective setAccessible(true) disabled
+13:31:10.802 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- java.nio.Bits.unaligned: available, true
+13:31:10.805 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable: class io.netty.util.internal.PlatformDependent0$7 cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @c97fc0d8
+13:31:10.809 [main] DEBUG io.netty.util.internal.PlatformDependent0 -- java.nio.DirectByteBuffer.<init>(long, {int,long}): unavailable
+13:31:10.810 [main] DEBUG io.netty.util.internal.PlatformDependent -- sun.misc.Unsafe: available
+13:31:10.811 [main] DEBUG io.netty.util.internal.PlatformDependent -- -Dio.netty.tmpdir: C:\Users\slick\AppData\Local\Temp (java.io.tmpdir)
+13:31:10.812 [main] DEBUG io.netty.util.internal.PlatformDependent -- -Dio.netty.bitMode: 64 (sun.arch.data.model)
+13:31:10.818 [main] DEBUG io.netty.util.internal.PlatformDependent -- Platform: Windows
+13:31:10.822 [main] DEBUG io.netty.util.internal.PlatformDependent -- -Dio.netty.maxDirectMemory: -1 bytes
+13:31:10.823 [main] DEBUG io.netty.util.internal.PlatformDependent -- -Dio.netty.uninitializedArrayAllocationThreshold: -1
+13:31:10.832 [main] DEBUG io.netty.util.internal.CleanerJava9 -- java.nio.ByteBuffer.cleaner(): available
+13:31:10.834 [main] DEBUG io.netty.util.internal.PlatformDependent -- -Dio.netty.noPreferDirect: false
+13:31:11.413 [main] DEBUG io.netty.channel.MultithreadEventLoopGroup -- -Dio.netty.eventLoopThreads: 8
+13:31:11.441 [main] DEBUG io.netty.util.concurrent.GlobalEventExecutor -- -Dio.netty.globalEventExecutor.quietPeriodSeconds: 1
+13:31:11.467 [main] DEBUG io.netty.util.internal.InternalThreadLocalMap -- -Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+13:31:11.467 [main] DEBUG io.netty.util.internal.InternalThreadLocalMap -- -Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+13:31:11.484 [main] DEBUG io.netty.channel.nio.NioEventLoop -- -Dio.netty.noKeySetOptimization: false
+13:31:11.484 [main] DEBUG io.netty.channel.nio.NioEventLoop -- -Dio.netty.selectorAutoRebuildThreshold: 512
+13:31:11.513 [main] DEBUG io.netty.util.internal.PlatformDependent -- org.jctools-core.MpscChunkedArrayQueue: available
+13:31:11.754 [main] DEBUG io.netty.channel.DefaultChannelId -- -Dio.netty.processId: 964 (auto-detected)
+13:31:11.784 [main] DEBUG io.netty.util.NetUtil -- -Djava.net.preferIPv4Stack: false
+13:31:11.787 [main] DEBUG io.netty.util.NetUtil -- -Djava.net.preferIPv6Addresses: false
+13:31:11.865 [main] DEBUG io.netty.util.NetUtilInitializations -- Loopback interface: lo (Software Loopback Interface 1, 127.0.0.1)
+13:31:11.869 [main] DEBUG io.netty.util.NetUtil -- Failed to get SOMAXCONN from sysctl and file \proc\sys\net\core\somaxconn. Default: 200
+13:31:12.046 [main] DEBUG io.netty.channel.DefaultChannelId -- -Dio.netty.machineId: 00:ff:06:ff:fe:1a:6e:f3 (auto-detected)
+13:31:12.128 [main] DEBUG io.netty.util.ResourceLeakDetector -- -Dio.netty.leakDetection.level: simple
+13:31:12.128 [main] DEBUG io.netty.util.ResourceLeakDetector -- -Dio.netty.leakDetection.targetRecords: 4
+13:31:12.275 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.numHeapArenas: 8
+13:31:12.276 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.numDirectArenas: 8
+13:31:12.277 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.pageSize: 8192
+13:31:12.278 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.maxOrder: 9
+13:31:12.278 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.chunkSize: 4194304
+13:31:12.278 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.smallCacheSize: 256
+13:31:12.278 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.normalCacheSize: 64
+13:31:12.279 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+13:31:12.280 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.cacheTrimInterval: 8192
+13:31:12.281 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+13:31:12.282 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.useCacheForAllThreads: false
+13:31:12.282 [main] DEBUG io.netty.buffer.PooledByteBufAllocator -- -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+13:31:12.330 [main] DEBUG io.netty.buffer.ByteBufUtil -- -Dio.netty.allocator.type: pooled
+13:31:12.331 [main] DEBUG io.netty.buffer.ByteBufUtil -- -Dio.netty.threadLocalDirectBufferSize: 0
+13:31:12.331 [main] DEBUG io.netty.buffer.ByteBufUtil -- -Dio.netty.maxThreadLocalCharBufferSize: 16384
+13:31:12.339 [main] DEBUG io.netty.bootstrap.ChannelInitializerExtensions -- -Dio.netty.bootstrap.extensions: null
+13:31:12.512 [DefaultDispatcher-worker-2] INFO ktor.application -- Responding at http://127.0.0.1:8080
+13:35:02.120 [eventLoopGroupProxy-3-1] DEBUG io.netty.buffer.AbstractByteBuf -- -Dio.netty.buffer.checkAccessible: true
+13:35:02.122 [eventLoopGroupProxy-3-1] DEBUG io.netty.buffer.AbstractByteBuf -- -Dio.netty.buffer.checkBounds: true
+13:35:02.127 [eventLoopGroupProxy-3-1] DEBUG io.netty.util.ResourceLeakDetectorFactory -- Loaded default ResourceLeakDetector: io.netty.util.ResourceLeakDetector@abc92652
+13:35:02.699 [eventLoopGroupProxy-3-1] DEBUG io.netty.util.Recycler -- -Dio.netty.recycler.maxCapacityPerThread: 4096
+13:35:02.734 [eventLoopGroupProxy-3-1] DEBUG io.netty.util.Recycler -- -Dio.netty.recycler.ratio: 8
+13:35:02.743 [eventLoopGroupProxy-3-1] DEBUG io.netty.util.Recycler -- -Dio.netty.recycler.chunkSize: 32
+13:35:02.746 [eventLoopGroupProxy-3-1] DEBUG io.netty.util.Recycler -- -Dio.netty.recycler.blocking: false
+13:35:02.762 [eventLoopGroupProxy-3-1] DEBUG io.netty.util.Recycler -- -Dio.netty.recycler.batchFastThreadLocalOnly: true
+? TRANSFER ORDER: $1.0 -> test
+? TRANSFER ORDER: $1.0 -> test
+[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ clear
+[?2004l[H[2J[3J[?2004h]0;MINGW64:/c/Users/slick/lumariq
+[32mslick@DESKTOP-1DLI9FF [35mMINGW64 [33m~/lumariq[36m (main)[0m
+$ bash -lc '
+set -euo pipefail
+python - << "PY"
+import os, textwrap
+p = r"C:\Temp\lumariq_backend_boot.sh"
+os.makedirs(r"C:\Temp", exist_ok=True)
+
+sh = textwrap.dedent("""\
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="/c/Users/slick/lumariq"
+BACK="$ROOT/backend-server"
+LOG="$ROOT/_backend_run.log"
+JDK_POSIX="/c/Users/slick/.jdks/jdk-17.0.17+10"
+JDK_MIXED="$(cygpath -m "$JDK_POSIX")"
+
+echo "ROOT=$ROOT"
+echo "BACK=$BACK"
+echo "LOG=$LOG"
+echo "JDK=$JDK_MIXED"
+"$JDK_POSIX/bin/java.exe" -version | head -n 3 || true
+echo
+
+if [ ! -d "$BACK" ]; then
+  echo "ERROR: Backend folder not found: $BACK"
+  ls -la "$ROOT" || true
+  exit 1
+fi
+
+echo "== Kill anything listening on 8080 =="
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "\
+$null = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1 -OutVariable conn; \
+if ($conn) { \
+  $p = $conn.OwningProcess; \
+  Write-Host ('Killing PID ' + $p + ' (port 8080)...'); \
+  Stop-Process -Id $p -Force -ErrorAction SilentlyContinue \
+} else { \
+  Write-Host 'Nobody listening on 8080' \
+[7m}" || true[27m
+[7mecho[27m
+
+[7mecho "== Start backend =="[27m
+[7mcd "$BACK"[27m
+[7m./gradlew --stop || true[27m
+[7mrm -f "$LOG" || true[27m
+
+[7mnohup ./gradlew -Dorg.gradle.java.home="$JDK_MIXED" --no-daemon run > "$LOG" 2>&1 &[27m
+[7mBPID=$![27m
+[7mecho "Started backend (bash pid): $BPID"[27m
+[7mecho[27m
+
+[7mecho "== Wait for LISTEN (up to 60s) =="[27m
+[7mok=0[27m
+[7mfor i in $(seq 1 60); do[27m[7m  if powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "exit (((Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne $null) ? 0 : 1)"[27m[7m ; then[27m[7m    ok=1[27m[7m    echo "LISTENING on 8080"[27m[7m    break[27m[7m  fi[27m[7m  sleep 1[27m[7mdone[27m[7mif [ "$ok" -ne 1 ]; then[27m[7m  echo "ERROR: Still not listening. Log tail:"[27m[7m  tail -n 200 "$LOG" || true[27m[7m  exit 1[27m[7mfi[27m[7mecho[27m[7mecho "== HOST check (127.0.0.1:8080) =="[27m[7mcurl -v -m 5 http://127.0.0.1:8080/ || true[27m[7mecho[27m[7mecho "== EMULATOR check via adb reverse (127.0.0.1:8080 on device) =="[27m[7madb reverse --remove-all || true[27m[7madb reverse tcp:8080 tcp:8080 || true[27m[7madb shell "toybox nc -z -w 2 127.0.0.1 8080 && echo EMULATOR_CAN_REACH_127_8080 || echo EMULATOR_NO_CONNECT" || true[27m[7mecho[27m[7mecho "== Log tail (last 80) =="[27m[7mtail -n 80 "$LOG" || true[27m[7mecho[27m[7mecho "DONE"[27m[7m""")[27m[7mwith open(p, "w", newline="\\n") as f:[27m[7m    f.write(sh)[27m[7mprint("WROTE:", p)[27m[7mPY[27m[7m'[27m[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A}" || true
+echo
+
+echo "== Start backend =="
+cd "$BACK"
+./gradlew --stop || true
+rm -f "$LOG" || true
+
+nohup ./gradlew -Dorg.gradle.java.home="$JDK_MIXED" --no-daemon run > "$LOG" 2>&1 &
+BPID=$!
+echo "Started backend (bash pid): $BPID"
+echo
+
+echo "== Wait for LISTEN (up to 60s) =="
+ok=0
+for i in $(seq 1 60); do  if powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "exit (((Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne $null) ? 0 : 1)" ; then    ok=1    echo "LISTENING on 8080"    break  fi  sleep 1doneif [ "$ok" -ne 1 ]; then  echo "ERROR: Still not listening. Log tail:"  tail -n 200 "$LOG" || true  exit 1fiechoecho "== HOST check (127.0.0.1:8080) =="curl -v -m 5 http://127.0.0.1:8080/ || trueechoecho "== EMULATOR check via adb reverse (127.0.0.1:8080 on device) =="adb reverse --remove-all || trueadb reverse tcp:8080 tcp:8080 || trueadb shell "toybox nc -z -w 2 127.0.0.1 8080 && echo EMULATOR_CAN_REACH_127_8080 || echo EMULATOR_NO_CONNECT" || trueechoecho "== Log tail (last 80) =="tail -n 80 "$LOG" || trueechoecho "DONE"""")with open(p, "w", newline="\\n") as f:    f.write(sh)print("WROTE:", p)PY'
+[?2004lbash: syntax error near unexpected token `('
+bash: syntax error near unexpected token `('
+
+== Wait for LISTEN (up to 60s) ==
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+ERROR: Still not listening. Log tail:
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+At line:1 char:94
++ ... calPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : ...
++                                                                  ~
+You must provide a value expression following the '-ne' operator.
+At line:1 char:97
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                  ~
+Unexpected token '?' in expression or statement.
+At line:1 char:96
++ ... lPort 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1 ...
++                                                                  ~
+Missing closing ')' in expression.
+At line:1 char:104
++ ... Port 8080 -State Listen -ErrorAction SilentlyContinue) -ne ) ? 0 : 1)
++                                                                         ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpectedValueExpression
+ 
+ERROR: Still not listening. Log tail:
+logout

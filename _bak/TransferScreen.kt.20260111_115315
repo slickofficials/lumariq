@@ -1,0 +1,153 @@
+package com.lumariq.android
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.lumariq.android.ui.theme.TerminalGreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+@Composable
+fun TransferScreen(nav: NavController, sensory: SensorySystem) {
+    var recipient by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf("READY") }
+    var txId by remember { mutableStateOf("") }
+    
+    // Hold-to-Send Logic
+    var isHolding by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(0f) }
+    val scope = rememberCoroutineScope()
+
+    // Animation for the hold button
+    LaunchedEffect(isHolding) {
+        if (isHolding) {
+            val startTime = System.currentTimeMillis()
+            while (isHolding && progress < 1f) {
+                val elapsed = System.currentTimeMillis() - startTime
+                progress = (elapsed / 1500f).coerceAtMost(1f) // 1.5 seconds to confirm
+                delay(16)
+            }
+            if (progress >= 1f) {
+                // EXECUTE
+                isHolding = false
+                sensory.feedbackClick()
+                status = "EXECUTING..."
+                scope.launch {
+                    val amt = amount.toDoubleOrNull() ?: 0.0
+                    val res = NetworkClient.executeTransfer(recipient, amt)
+                    status = if (res.status == "SUCCESS") "CONFIRMED" else "FAILED"
+                    txId = res.txId
+                }
+            }
+        } else {
+            progress = 0f
+        }
+    }
+
+    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Text(">_ WIRE TRANSFER", color = TerminalGreen, style = MaterialTheme.typography.headlineMedium)
+
+        OutlinedTextField(
+            value = recipient,
+            onValueChange = { recipient = it },
+            label = { Text("RECIPIENT ID", color = Color.Gray) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TerminalGreen,
+                unfocusedBorderColor = Color.DarkGray,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = amount,
+            onValueChange = { amount = it },
+            label = { Text("AMOUNT (USD)", color = Color.Gray) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TerminalGreen,
+                unfocusedBorderColor = Color.DarkGray,
+                focusedTextColor = TerminalGreen,
+                unfocusedTextColor = TerminalGreen
+            ),
+            textStyle = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        // STATUS DISPLAY
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF111111)),
+            border = BorderStroke(1.dp, if (status == "FAILED") Color.Red else TerminalGreen),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text("STATUS: $status", color = if (status == "FAILED") Color.Red else Color.White)
+                if (txId.isNotEmpty()) {
+                    Text("TXID: $txId", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
+                }
+            }
+        }
+
+        Spacer(Modifier.weight(1f))
+
+        // HOLD BUTTON
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .background(Color(0xFF222222), RoundedCornerShape(8.dp))
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            if (status != "EXECUTING") {
+                                isHolding = true
+                                sensory.feedbackClick()
+                                tryAwaitRelease()
+                                isHolding = false
+                            }
+                        }
+                    )
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            // Progress Fill
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(progress)
+                    .align(Alignment.CenterStart)
+                    .background(TerminalGreen.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+            )
+            Text(
+                if (progress >= 1f) "SENT" else "HOLD TO AUTHORIZE",
+                color = if (progress > 0.5f) Color.Black else Color.White,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Button(
+            onClick = { nav.popBackStack() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("CANCEL", color = Color.Gray)
+        }
+    }
+}

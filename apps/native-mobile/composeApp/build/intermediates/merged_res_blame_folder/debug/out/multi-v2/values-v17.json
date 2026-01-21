@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.lumariq.android.composeApp-mergeDebugResources-63:/values-v17/values-v17.xml",
+            "outputFile": "com.lumariq.android.composeApp-mergeDebugResources-50:/values-v17/values-v17.xml",
             "map": [
                 {
                     "source": "C:\\Users\\slick\\.gradle\\caches\\transforms-3\\052a87986c8713cf9d180dcb8a8e2416\\transformed\\appcompat-1.6.1\\res\\values-v17\\values-v17.xml",

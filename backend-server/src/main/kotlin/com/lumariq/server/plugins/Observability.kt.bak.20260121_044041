@@ -1,0 +1,25 @@
+package com.lumariq.server.plugins
+
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+
+/**
+ * Zero-extra-deps observability (no Ktor plugin artifacts required).
+ * Logs method + path + status for every call.
+ */
+fun Application.configureObservability() {
+    // capture explicitly so Kotlin doesn't complain about receiver ambiguity
+    val log = this.environment.log
+
+    intercept(ApplicationCallPipeline.Monitoring) {
+        try {
+            proceed()
+        } finally {
+            val method = call.request.httpMethod.value
+            val path = call.request.path()
+            val status = call.response.status()?.value ?: 0
+            log.info("$method $path -> $status")
+        }
+    }
+}

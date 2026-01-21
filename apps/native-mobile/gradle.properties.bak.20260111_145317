@@ -1,0 +1,26 @@
+# ===============================
+# ⚙️ GRADLE CORE
+# ===============================
+org.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8
+org.gradle.daemon=false
+org.gradle.parallel=false
+org.gradle.configureondemand=false
+
+# ===============================
+# 🌐 NETWORK HARDENING (CRITICAL)
+# ===============================
+systemProp.org.gradle.internal.http.connectionTimeout=600000
+systemProp.org.gradle.internal.http.socketTimeout=600000
+systemProp.org.gradle.internal.repository.max.retries=10
+systemProp.org.gradle.internal.repository.initial.backoff=2000
+
+# ===============================
+# 🤖 ANDROID / KOTLIN
+# ===============================
+android.useAndroidX=true
+kotlin.code.style=official
+kotlin.native.ignoreDisabledTargets=true
+kotlin.compiler.execution.strategy=in-process
+org.gradle.java.home=C:SERSSLICK.JDKSJDK-17.0.17+10
+kotlin.daemon.enabled=false
+org.gradle.workers.max=1

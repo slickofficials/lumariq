@@ -1,0 +1,40 @@
+===== LUMARIQ NET DIAG =====
+Time: Mon Jan 19 20:47:36 WCAST 2026
+PWD:  /c/Users/slick/lumariq
+
+==> ADB devices
+
+$ adb devices -l
+List of devices attached
+34494a3451583098       device product:star2qltesq model:SM_G965U device:star2qltesq transport_id:4
+
+
+DEVICE=34494a3451583098
+
+==> Port 8080 on Windows (netstat) — no PowerShell needed
+
+$ cmd.exe /c "netstat -ano | findstr :8080"
+Microsoft Windows [Version 10.0.19045.6466]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\slick\lumariq>===== LUMARIQ NET DIAG =====
+Time: Mon Jan 19 20:47:36 WCAST 2026
+PWD:  /c/Users/slick/lumariq
+
+==> ADB devices
+
+$ adb devices -l
+List of devices attached
+34494a3451583098       device product:star2qltesq model:SM_G965U device:star2qltesq transport_id:4
+
+
+DEVICE=34494a3451583098
+
+==> Port 8080 on Windows (netstat) — no PowerShell needed
+
+$ cmd.exe /c "netstat -ano | findstr :8080"
+Microsoft Windows [Version 10.0.19045.6466]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\slick\lumariq>
+C:\Users\slick\lumariq>

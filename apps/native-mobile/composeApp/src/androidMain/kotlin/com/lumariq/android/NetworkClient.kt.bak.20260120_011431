@@ -1,0 +1,27 @@
+package com.lumariq.android
+
+import com.lumariq.android.net.BackendBaseUrl
+import java.net.HttpURLConnection
+import java.net.URL
+
+object NetworkClient {
+
+    fun getRoot(): String = httpGet("${BackendBaseUrl.current()}/")
+    fun getHealth(): String = httpGet("${BackendBaseUrl.current()}/health")
+
+    private fun httpGet(url: String): String {
+        val conn = (URL(url).openConnection() as HttpURLConnection).apply {
+            requestMethod = "GET"
+            connectTimeout = 4000
+            readTimeout = 4000
+        }
+        return try {
+            val code = conn.responseCode
+            val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+            val body = stream?.bufferedReader()?.readText().orEmpty()
+            if (body.isNotBlank()) body else "HTTP $code"
+        } finally {
+            conn.disconnect()
+        }
+    }
+}

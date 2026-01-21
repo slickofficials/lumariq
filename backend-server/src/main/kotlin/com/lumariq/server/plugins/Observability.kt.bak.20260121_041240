@@ -1,0 +1,96 @@
+package com.lumariq.server.plugins
+
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.response.header
+import io.ktor.util.AttributeKey
+import java.time.Instant
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+
+private val REQUEST_ID_KEY = AttributeKey<String>("requestId")
+
+private fun ApplicationCall.requestIdOrNull(): String? =
+    try { attributes[REQUEST_ID_KEY] } catch (_: Throwable) { null }
+
+private fun jsonEscape(s: String): String =
+    s.replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t")
+
+private fun errorJson(code: String, message: String, requestId: String?): String {
+    val rid = requestId ?: ""
+    return """{"error":"${jsonEscape(code)}","message":"${jsonEscape(message)}","requestId":"${jsonEscape(rid)}","timestamp":"${Instant.now()}"}"""
+}
+
+private object SimpleRateLimit {
+    private const val WINDOW_MS = 60_000L
+    private const val MAX_REQ_PER_WINDOW = 240
+    private val buckets = ConcurrentHashMap<String, Pair<Long, Int>>() // (windowStart, count)
+
+    fun allow(key: String): Boolean {
+        val now = System.currentTimeMillis()
+        while (true) {
+            val cur = buckets[key]
+            if (cur == null) {
+                if (buckets.putIfAbsent(key, now to 1) == null) return true
+                continue
+            }
+            val (start, count) = cur
+            val next = if (now - start >= WINDOW_MS) now to 1 else start to (count + 1)
+            if (buckets.replace(key, cur, next)) return next.second <= MAX_REQ_PER_WINDOW
+        }
+    }
+}
+
+private fun ApplicationCall.clientKey(): String {
+    val xff = request.headers["X-Forwarded-For"]?.split(",")?.firstOrNull()?.trim()
+    val xri = request.headers["X-Real-IP"]?.trim()
+    return (xff?.takeIf { it.isNotBlank() } ?: xri?.takeIf { it.isNotBlank() } ?: "unknown").take(128)
+}
+
+fun Application.configureObservability() {
+    val log = environment.log
+
+    intercept(ApplicationCallPipeline.Setup) {
+        val existing = call.request.headers["X-Request-Id"]?.trim()
+        val rid = (existing?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString()).take(128)
+        call.attributes.put(REQUEST_ID_KEY, rid)
+        call.response.header("X-Request-Id", rid)
+    }
+
+    intercept(ApplicationCallPipeline.Monitoring) {
+        val startNs = System.nanoTime()
+        val rid = call.requestIdOrNull()
+
+        // cheap IP-based rate limit
+        if (!SimpleRateLimit.allow(call.clientKey())) {
+            call.respondText(
+                errorJson("rate_limited", "Too many requests", rid),
+                ContentType.Application.Json,
+                HttpStatusCode.TooManyRequests
+            )
+            return@intercept
+        }
+
+        try {
+            proceed()
+        } catch (t: Throwable) {
+            log.error("Unhandled error rid=$rid path=${call.request.path()}: ${t.message}", t)
+            if (!call.response.isCommitted) {
+                call.respondText(
+                    errorJson("internal_error", t.message ?: "Internal error", rid),
+                    ContentType.Application.Json,
+                    HttpStatusCode.InternalServerError
+                )
+            }
+        } finally {
+            val ms = (System.nanoTime() - startNs) / 1_000_000
+            val status = call.response.status()?.value ?: 0
+            log.info("rid=$rid ${call.request.httpMethod.value} ${call.request.path()} -> $status in ${ms}ms")
+        }
+    }
+}

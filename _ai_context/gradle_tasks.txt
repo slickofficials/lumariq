@@ -1,0 +1,39 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.5/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :tasks
+
+------------------------------------------------------------
+Tasks runnable from root project 'lumariq'
+------------------------------------------------------------
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+wrapper - Generates Gradle wrapper files.
+
+Help tasks
+----------
+buildEnvironment - Displays all buildscript dependencies declared in root project 'lumariq'.
+dependencies - Displays all dependencies declared in root project 'lumariq'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'lumariq'.
+help - Displays a help message.
+javaToolchains - Displays the detected java toolchains.
+outgoingVariants - Displays the outgoing variants of root project 'lumariq'.
+projects - Displays the sub-projects of root project 'lumariq'.
+properties - Displays the properties of root project 'lumariq'.
+resolvableConfigurations - Displays the configurations that can be resolved in root project 'lumariq'.
+tasks - Displays the tasks runnable from root project 'lumariq' (some of the displayed tasks may belong to subprojects).
+
+To see all tasks and more detail, run gradlew tasks --all
+
+To see more detail about a task, run gradlew help --task <task>
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 23s
+1 actionable task: 1 executed

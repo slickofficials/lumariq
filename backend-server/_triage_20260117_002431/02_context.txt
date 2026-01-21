@@ -1,0 +1,240 @@
+===== CONTEXT: AuthorizeScreen =====
+===== CONTEXT: TransferScreen =====
+===== CONTEXT: TransactionsScreen =====
+===== CONTEXT: NetworkClient =====
+===== CONTEXT: MainActivity =====
+===== CONTEXT: AndroidManifest =====
+===== CONTEXT: Application.kt =====
+./_triage_20260117_002431/00_files_scanned.txt-1-./build.gradle.kts
+./_triage_20260117_002431/00_files_scanned.txt-2-./gradle/jvm-toolchain.gradle.kts
+./_triage_20260117_002431/00_files_scanned.txt-3-./settings.gradle.kts
+./_triage_20260117_002431/00_files_scanned.txt:4:./src/main/kotlin/com/lumariq/server/Application.kt
+./_triage_20260117_002431/00_files_scanned.txt-5-./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt
+--
+./_triage_20260117_002431/01_matches.txt:1:./src/main/kotlin/com/lumariq/server/Application.kt:16:import com.lumariq.server.transferAuthRoutes
+./_triage_20260117_002431/01_matches.txt:2:./src/main/kotlin/com/lumariq/server/Application.kt:91:embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:3:./src/main/kotlin/com/lumariq/server/Application.kt:108:        transferAuthRoutes()
+./_triage_20260117_002431/01_matches.txt:4:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:5:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:6:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:16:import com.lumariq.server.transferAuthRoutes
+./_triage_20260117_002431/01_matches.txt:7:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:90:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:8:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:106:        transferAuthRoutes()
+./_triage_20260117_002431/01_matches.txt-9-./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt:68:fun Route.transferAuthRoutes() {
+===== CONTEXT: transferAuthRoutes =====
+./src/main/kotlin/com/lumariq/server/Application.kt-6-import io.ktor.server.netty.*
+./src/main/kotlin/com/lumariq/server/Application.kt-7-import io.ktor.server.response.*
+./src/main/kotlin/com/lumariq/server/Application.kt-8-import io.ktor.server.request.*
+./src/main/kotlin/com/lumariq/server/Application.kt-9-import io.ktor.server.routing.*
+./src/main/kotlin/com/lumariq/server/Application.kt-10-import io.ktor.server.plugins.contentnegotiation.*
+./src/main/kotlin/com/lumariq/server/Application.kt-11-import io.ktor.serialization.kotlinx.json.*
+./src/main/kotlin/com/lumariq/server/Application.kt-12-import kotlinx.serialization.Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt-13-import kotlinx.serialization.json.Json
+./src/main/kotlin/com/lumariq/server/Application.kt-14-import java.time.Instant
+./src/main/kotlin/com/lumariq/server/Application.kt-15-import java.util.UUID
+./src/main/kotlin/com/lumariq/server/Application.kt:16:import com.lumariq.server.transferAuthRoutes
+./src/main/kotlin/com/lumariq/server/Application.kt-17-
+./src/main/kotlin/com/lumariq/server/Application.kt-18-@Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt-19-data class Transaction(
+./src/main/kotlin/com/lumariq/server/Application.kt-20-    val id: String,
+./src/main/kotlin/com/lumariq/server/Application.kt-21-    val type: String,      // CREDIT, DEBIT
+./src/main/kotlin/com/lumariq/server/Application.kt-22-    val amount: Long,      // In cents
+./src/main/kotlin/com/lumariq/server/Application.kt-23-    val currency: String,
+./src/main/kotlin/com/lumariq/server/Application.kt-24-    val status: String,    // COMPLETED, PENDING, FAILED
+./src/main/kotlin/com/lumariq/server/Application.kt-25-    val counterparty: String?,
+./src/main/kotlin/com/lumariq/server/Application.kt-26-    val memo: String?,
+--
+./src/main/kotlin/com/lumariq/server/Application.kt-98-        json(
+./src/main/kotlin/com/lumariq/server/Application.kt-99-            Json {
+./src/main/kotlin/com/lumariq/server/Application.kt-100-                prettyPrint = true
+./src/main/kotlin/com/lumariq/server/Application.kt-101-                isLenient = true
+./src/main/kotlin/com/lumariq/server/Application.kt-102-                ignoreUnknownKeys = true
+./src/main/kotlin/com/lumariq/server/Application.kt-103-            }
+./src/main/kotlin/com/lumariq/server/Application.kt-104-        )
+./src/main/kotlin/com/lumariq/server/Application.kt-105-    }
+./src/main/kotlin/com/lumariq/server/Application.kt-106-
+./src/main/kotlin/com/lumariq/server/Application.kt-107-    routing {
+./src/main/kotlin/com/lumariq/server/Application.kt:108:        transferAuthRoutes()
+./src/main/kotlin/com/lumariq/server/Application.kt-109-
+./src/main/kotlin/com/lumariq/server/Application.kt-110-        get("/") { call.respondText("LUMARIQ CENTRAL BANK: ONLINE") }
+./src/main/kotlin/com/lumariq/server/Application.kt-111-
+./src/main/kotlin/com/lumariq/server/Application.kt-112-        get("/status") {
+./src/main/kotlin/com/lumariq/server/Application.kt-113-            call.respond(mapOf("status" to "OPERATIONAL", "tier" to "GOVERNOR"))
+./src/main/kotlin/com/lumariq/server/Application.kt-114-        }
+./src/main/kotlin/com/lumariq/server/Application.kt-115-
+./src/main/kotlin/com/lumariq/server/Application.kt-116-        get("/v1/transactions") {
+./src/main/kotlin/com/lumariq/server/Application.kt-117-            call.respond(TransactionStore.getAll())
+./src/main/kotlin/com/lumariq/server/Application.kt-118-        }
+--
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-6-import io.ktor.server.netty.*
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-7-import io.ktor.server.response.*
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-8-import io.ktor.server.request.*
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-9-import io.ktor.server.routing.*
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-10-import io.ktor.server.plugins.contentnegotiation.*
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-11-import io.ktor.serialization.kotlinx.json.*
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-12-import kotlinx.serialization.Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-13-import kotlinx.serialization.json.Json
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-14-import java.time.Instant
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-15-import java.util.UUID
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:16:import com.lumariq.server.transferAuthRoutes
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-17-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-18-@Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-19-data class Transaction(
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-20-    val id: String,
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-21-    val type: String,      // CREDIT, DEBIT
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-22-    val amount: Long,      // In cents
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-23-    val currency: String,
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-24-    val status: String,    // COMPLETED, PENDING, FAILED
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-25-    val counterparty: String?,
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-26-    val memo: String?,
+--
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-96-        json(
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-97-            Json {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-98-                prettyPrint = true
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-99-                isLenient = true
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-100-                ignoreUnknownKeys = true
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-101-            }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-102-        )
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-103-    }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-104-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-105-    routing {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:106:        transferAuthRoutes()
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-107-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-108-        get("/") { call.respondText("LUMARIQ CENTRAL BANK: ONLINE") }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-109-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-110-        get("/status") {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-111-            call.respond(mapOf("status" to "OPERATIONAL", "tier" to "GOVERNOR"))
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-112-        }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-113-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-114-        get("/v1/transactions") {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-115-            call.respond(TransactionStore.getAll())
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-116-        }
+--
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-58-    i.intentId,
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-59-    i.recipient,
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-60-    i.amount.toString(),
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-61-    i.currency,
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-62-    i.challenge,
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-63-    i.expiresAtEpochMs.toString()
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-64-  ).joinToString("|")
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-65-  return s.toByteArray(Charsets.UTF_8)
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-66-}
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-67-
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt:68:fun Route.transferAuthRoutes() {
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-69-
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-70-  route("/v1/transfers") {
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-71-
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-72-    post("/prepare") {
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-73-      val req = call.receive<PrepareTransferReq>()
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-74-      val recipient = req.recipient.trim()
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-75-      val amount = req.amount
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-76-
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-77-      if (recipient.isBlank() || amount <= 0.0) {
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt-78-        call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid recipient/amount"))
+--
+./_triage_20260117_002431/01_matches.txt:1:./src/main/kotlin/com/lumariq/server/Application.kt:16:import com.lumariq.server.transferAuthRoutes
+./_triage_20260117_002431/01_matches.txt-2-./src/main/kotlin/com/lumariq/server/Application.kt:91:embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:3:./src/main/kotlin/com/lumariq/server/Application.kt:108:        transferAuthRoutes()
+./_triage_20260117_002431/01_matches.txt-4-./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt-5-./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:6:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:16:import com.lumariq.server.transferAuthRoutes
+./_triage_20260117_002431/01_matches.txt-7-./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:90:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:8:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:106:        transferAuthRoutes()
+./_triage_20260117_002431/01_matches.txt:9:./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt:68:fun Route.transferAuthRoutes() {
+===== CONTEXT: embeddedServer =====
+./src/main/kotlin/com/lumariq/server/Application.kt-81-
+./src/main/kotlin/com/lumariq/server/Application.kt-82-        synchronized(this) {
+./src/main/kotlin/com/lumariq/server/Application.kt-83-            transactions.add(0, newTx)
+./src/main/kotlin/com/lumariq/server/Application.kt-84-        }
+./src/main/kotlin/com/lumariq/server/Application.kt-85-        return txId
+./src/main/kotlin/com/lumariq/server/Application.kt-86-    }
+./src/main/kotlin/com/lumariq/server/Application.kt-87-}
+./src/main/kotlin/com/lumariq/server/Application.kt-88-
+./src/main/kotlin/com/lumariq/server/Application.kt-89-fun main() {
+./src/main/kotlin/com/lumariq/server/Application.kt-90-    
+./src/main/kotlin/com/lumariq/server/Application.kt:91:embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./src/main/kotlin/com/lumariq/server/Application.kt-92-
+./src/main/kotlin/com/lumariq/server/Application.kt-93-        .start(wait = true)
+./src/main/kotlin/com/lumariq/server/Application.kt-94-}
+./src/main/kotlin/com/lumariq/server/Application.kt-95-
+./src/main/kotlin/com/lumariq/server/Application.kt-96-fun Application.module() {
+./src/main/kotlin/com/lumariq/server/Application.kt-97-    install(ContentNegotiation) {
+./src/main/kotlin/com/lumariq/server/Application.kt-98-        json(
+./src/main/kotlin/com/lumariq/server/Application.kt-99-            Json {
+./src/main/kotlin/com/lumariq/server/Application.kt-100-                prettyPrint = true
+./src/main/kotlin/com/lumariq/server/Application.kt-101-                isLenient = true
+--
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-11-import kotlinx.serialization.Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-12-import kotlinx.serialization.json.Json
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-13-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-14-@Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-15-data class TransactionRequest(val recipient: String, val amount: Double)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-16-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-17-@Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-18-data class TransactionResponse(val status: String, val txId: String, val message: String)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-19-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-20-fun main() {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-22-        .start(wait = true)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-23-}
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-24-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-25-fun Application.module() {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-26-    install(ContentNegotiation) {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-27-        json(Json { prettyPrint = true; isLenient = true })
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-28-    }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-29-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-30-    routing {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426-31-        get("/") {
+--
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-11-import kotlinx.serialization.Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-12-import kotlinx.serialization.json.Json
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-13-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-14-@Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-15-data class TransactionRequest(val recipient: String, val amount: Double)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-16-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-17-@Serializable
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-18-data class TransactionResponse(val status: String, val txId: String, val message: String)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-19-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-20-fun main() {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-22-        .start(wait = true)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-23-}
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-24-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-25-fun Application.module() {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-26-    install(ContentNegotiation) {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-27-        json(Json { prettyPrint = true; isLenient = true })
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-28-    }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-29-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-30-    routing {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527-31-        get("/") {
+--
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-80-        )
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-81-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-82-        synchronized(this) {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-83-            transactions.add(0, newTx)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-84-        }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-85-        return txId
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-86-    }
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-87-}
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-88-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-89-fun main() {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:90:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-91-        .start(wait = true)
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-92-}
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-93-
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-94-fun Application.module() {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-95-    install(ContentNegotiation) {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-96-        json(
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-97-            Json {
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-98-                prettyPrint = true
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-99-                isLenient = true
+./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128-100-                ignoreUnknownKeys = true
+--
+./_triage_20260117_002431/01_matches.txt-1-./src/main/kotlin/com/lumariq/server/Application.kt:16:import com.lumariq.server.transferAuthRoutes
+./_triage_20260117_002431/01_matches.txt:2:./src/main/kotlin/com/lumariq/server/Application.kt:91:embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt-3-./src/main/kotlin/com/lumariq/server/Application.kt:108:        transferAuthRoutes()
+./_triage_20260117_002431/01_matches.txt:4:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260111_154426:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt:5:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260112_164527:21:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt-6-./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:16:import com.lumariq.server.transferAuthRoutes
+./_triage_20260117_002431/01_matches.txt:7:./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:90:    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+./_triage_20260117_002431/01_matches.txt-8-./src/main/kotlin/com/lumariq/server/Application.kt.bak.20260116_073128:106:        transferAuthRoutes()
+./_triage_20260117_002431/01_matches.txt-9-./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt:68:fun Route.transferAuthRoutes() {

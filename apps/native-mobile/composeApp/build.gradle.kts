@@ -1,56 +1,75 @@
-plugins {
+﻿plugins {
+    id("org.jetbrains.kotlin.multiplatform") version "1.9.23"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
     id("com.android.application")
-    id("org.jetbrains.kotlin.android") // Inherits version 1.9.23 from Root
+    id("org.jetbrains.compose") version "1.6.1"
+}
+
+kotlin {
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+    
+    sourceSets {
+        commonMain.dependencies {
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            
+            // Core Logic
+            implementation("io.ktor:ktor-client-core:2.3.7")
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+        }
+        
+        androidMain.dependencies {
+            implementation(compose.preview)
+            // ðŸ›¡ï¸ PRODUCTION STACK: Activity + Navigation + Networking
+            implementation("androidx.activity:activity-compose:1.8.2")
+            implementation("androidx.navigation:navigation-compose:2.7.6")
+            implementation("io.ktor:ktor-client-okhttp:2.3.7")
+        }
+    }
 }
 
 android {
     namespace = "com.lumariq.android"
     compileSdk = 34
 
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].res.srcDirs("src/androidMain/res")
+    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+
     defaultConfig {
         applicationId = "com.lumariq.android"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.0"
     }
-
-    buildFeatures {
-        compose = true
-    }
-
-    composeOptions {
-        // ✅ NOW COMPATIBLE: Kotlin 1.9.23 <-> Compose 1.5.11
-        kotlinCompilerExtensionVersion = "1.5.11"
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        jvmToolchain(17)
-    }
-
+    
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
-dependencies {
-    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.1")
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation(project(":shared"))
-    debugImplementation("androidx.compose.ui:ui-tooling")
-}

@@ -1,0 +1,52 @@
+package com.lumariq.android
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class MainActivity : ComponentActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContent { LumariqAppRoot() }
+  }
+}
+
+@Composable
+private fun LumariqAppRoot() {
+  val scope = rememberCoroutineScope()
+  var status by remember { mutableStateOf("Root UI is live. Next: wire navigation + backend calls.") }
+  var loading by remember { mutableStateOf(false) }
+
+  Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Text("LUMARIQ ✅")
+    Spacer(Modifier.height(12.dp))
+    Text(status)
+    Spacer(Modifier.height(18.dp))
+
+    Button(
+      enabled = !loading,
+      onClick = {
+        loading = true
+        status = "Calling backend…"
+        scope.launch {
+          val result = withContext(Dispatchers.IO) {
+            runCatching { NetworkClient.getHealth() }.getOrElse { "ERR: ${it.message}" }
+          }
+          status = "Backend says: $result"
+          loading = false
+        }
+      }
+    ) {
+      Text(if (loading) "Loading…" else "Continue")
+    }
+  }
+}

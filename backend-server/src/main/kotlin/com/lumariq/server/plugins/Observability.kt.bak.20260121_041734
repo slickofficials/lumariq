@@ -1,0 +1,30 @@
+package com.lumariq.server.plugins
+
+import io.ktor.server.application.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import org.slf4j.event.Level
+
+fun Application.configureObservability() {
+    install(DefaultHeaders)
+
+    install(CallLogging) {
+        level = Level.INFO
+        format { call ->
+            val method = call.request.httpMethod.value
+            val path = call.request.path()
+            val status = call.response.status()?.value ?: 0
+            "$method $path -> $status"
+        }
+    }
+
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            environment.log.error("Unhandled error", cause)
+            call.respondText("internal_error", status = io.ktor.http.HttpStatusCode.InternalServerError)
+        }
+    }
+}

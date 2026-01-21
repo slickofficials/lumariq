@@ -1,0 +1,5 @@
+./build.gradle.kts
+./gradle/jvm-toolchain.gradle.kts
+./settings.gradle.kts
+./src/main/kotlin/com/lumariq/server/Application.kt
+./src/main/kotlin/com/lumariq/server/TransferAuthRoutes.kt

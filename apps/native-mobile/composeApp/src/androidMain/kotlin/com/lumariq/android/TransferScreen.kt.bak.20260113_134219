@@ -1,0 +1,116 @@
+package com.lumariq.android
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.lumariq.android.ui.theme.TerminalGreen
+import kotlin.math.abs
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransferScreen(nav: NavController, sensory: SensorySystem) {
+    var recipient by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf<String?>(null) }
+
+    fun parseAmt(): Double = amount.trim().toDoubleOrNull() ?: 0.0
+
+    Scaffold(
+        containerColor = Color.Black,
+        topBar = {
+            TopAppBar(
+                title = { Text(">_ TRANSFER", color = TerminalGreen, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    TextButton(onClick = { nav.popBackStack() }) { Text("< BACK", color = TerminalGreen) }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+            )
+        }
+    ) { pad ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(pad).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedTextField(
+                value = recipient,
+                onValueChange = { recipient = it },
+                label = { Text("RECIPIENT", color = Color(0xFFBDBDBD)) },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TerminalGreen,
+                    unfocusedBorderColor = Color(0xFF444444),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color(0xFF111111),
+                    unfocusedContainerColor = Color(0xFF111111),
+                    focusedLabelColor = TerminalGreen,
+                    unfocusedLabelColor = Color(0xFFBDBDBD)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = amount,
+                onValueChange = { amount = it },
+                label = { Text("AMOUNT (USD)", color = Color(0xFFBDBDBD)) },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TerminalGreen,
+                    unfocusedBorderColor = Color(0xFF444444),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color(0xFF111111),
+                    unfocusedContainerColor = Color(0xFF111111),
+                    focusedLabelColor = TerminalGreen,
+                    unfocusedLabelColor = Color(0xFFBDBDBD)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (message != null) {
+                Text(message!!, color = Color(0xFFFF6B6B))
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(
+                        onClick = { /* no-op: HOLD is long-press */ },
+                        onLongClick = {
+                            val r = recipient.trim()
+                            val a = parseAmt()
+                            if (r.isBlank() || a <= 0.0) {
+                                message = "Invalid recipient/amount"
+                                return@combinedClickable
+                            }
+
+                            // Stash pending transfer info for AUTH screen
+                            nav.currentBackStackEntry?.savedStateHandle?.set("pending_recipient", r)
+                            nav.currentBackStackEntry?.savedStateHandle?.set("pending_amount", a)
+
+                            // haptic + go
+                            try { sensory.tap() } catch (_: Throwable) {}
+                            nav.navigate("auth")
+                        }
+                    ),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF101010)),
+                border = BorderStroke(1.dp, TerminalGreen)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("HOLD TO AUTHORIZE", color = TerminalGreen, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(6.dp))
+                    Text("Long-press to open AUTH (PIN 0000)", color = Color(0xFFBDBDBD))
+                    Spacer(Modifier.height(6.dp))
+                    Text("Tip: PIN is 0000", color = Color(0xFF7A7A7A))
+                }
+            }
+        }
+    }
+}

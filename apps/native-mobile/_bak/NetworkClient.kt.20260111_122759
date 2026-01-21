@@ -1,0 +1,84 @@
+package com.lumariq.android
+
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.defaultRequest.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class TransferReq(val recipient: String, val amount: Double)
+
+@Serializable
+data class TransferResp(val status: String, val txId: String, val message: String)
+
+object NetworkClient {
+    // Emulator -> host machine
+    private const val BASE_URL = "http://10.0.2.2:8080"
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        explicitNulls = false
+    }
+
+    private val client = HttpClient(OkHttp) {
+        expectSuccess = false
+
+        install(ContentNegotiation) {
+            json(json)
+        }
+
+        install(HttpTimeout) {
+            connectTimeoutMillis = 5_000
+            requestTimeoutMillis = 10_000
+            socketTimeoutMillis = 10_000
+        }
+
+        // Ktor 2.x: DefaultRequest plugin
+        install(DefaultRequest) {
+            url(BASE_URL)
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+        }
+    }
+
+    suspend fun check(): String =
+        runCatching { client.get("/").bodyAsText() }
+            .getOrElse { e -> "OFFLINE: ${e.message}" }
+
+    suspend fun executeTransfer(recipient: String, amount: Double): TransferResp {
+        return runCatching {
+            val response: HttpResponse = client.post("/transfer") {
+                setBody(TransferReq(recipient, amount))
+            }
+
+            val text = response.bodyAsText()
+
+            if (!response.status.isSuccess()) {
+                TransferResp(
+                    status = "ERROR",
+                    txId = "000",
+                    message = "HTTP ${response.status.value}: $text"
+                )
+            } else {
+                runCatching { json.decodeFromString(TransferResp.serializer(), text) }
+                    .getOrElse {
+                        TransferResp(
+                            status = "ERROR",
+                            txId = "000",
+                            message = "Bad JSON: $text"
+                        )
+                    }
+            }
+        }.getOrElse { e ->
+            TransferResp("ERROR", "000", e.message ?: "Network Failure")
+        }
+    }
+}

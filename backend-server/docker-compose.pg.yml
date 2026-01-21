@@ -1,0 +1,21 @@
+services:
+  lumariq-postgres:
+    image: postgres:16-alpine
+    container_name: lumariq-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lumariq
+      POSTGRES_PASSWORD: lumariq_dev_pw
+      POSTGRES_DB: lumariq
+    ports:
+      - "5432:5432"
+    volumes:
+      - lumariq_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lumariq -d lumariq"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  lumariq_pg_data:

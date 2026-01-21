@@ -1,18 +1,22 @@
 [
     {
-        "merged": "com.lumariq.android.composeApp-merged_res-65:/drawable_ic_terminal_launcher.xml.flat",
-        "source": "com.lumariq.android.composeApp-main-67:/drawable/ic_terminal_launcher.xml"
+        "merged": "com.lumariq.android.composeApp-merged_res-52:/drawable_ic_lumariq_node.xml.flat",
+        "source": "com.lumariq.android.composeApp-androidMain-53:/drawable/ic_lumariq_node.xml"
     },
     {
-        "merged": "com.lumariq.android.composeApp-merged_res-65:/drawable_ic_lumariq_node.xml.flat",
-        "source": "com.lumariq.android.composeApp-main-67:/drawable/ic_lumariq_node.xml"
+        "merged": "com.lumariq.android.composeApp-merged_res-52:/xml_network_security_config.xml.flat",
+        "source": "com.lumariq.android.composeApp-androidMain-53:/xml/network_security_config.xml"
     },
     {
-        "merged": "com.lumariq.android.composeApp-merged_res-65:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.lumariq.android.composeApp-main-67:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.lumariq.android.composeApp-merged_res-52:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.lumariq.android.composeApp-androidMain-53:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.lumariq.android.composeApp-merged_res-65:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.lumariq.android.composeApp-main-67:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "com.lumariq.android.composeApp-merged_res-52:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.lumariq.android.composeApp-androidMain-53:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.lumariq.android.composeApp-merged_res-52:/drawable_ic_terminal_launcher.xml.flat",
+        "source": "com.lumariq.android.composeApp-androidMain-53:/drawable/ic_terminal_launcher.xml"
     }
 ]
