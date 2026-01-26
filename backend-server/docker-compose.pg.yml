@@ -2,20 +2,40 @@ services:
   lumariq-postgres:
     image: postgres:16-alpine
     container_name: lumariq-postgres
-    restart: unless-stopped
     environment:
+      POSTGRES_DB: dispatch
       POSTGRES_USER: lumariq
       POSTGRES_PASSWORD: lumariq_dev_pw
-      POSTGRES_DB: lumariq
     ports:
       - "5432:5432"
-    volumes:
-      - lumariq_pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lumariq -d lumariq"]
-      interval: 2s
+      test: ["CMD-SHELL", "pg_isready -U lumariq -d dispatch"]
+      interval: 3s
       timeout: 3s
-      retries: 30
+      retries: 25
+    restart: unless-stopped
 
-volumes:
-  lumariq_pg_data:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: backend-server-api:latest
+    container_name: backend-server-api
+    depends_on:
+      lumariq-postgres:
+        condition: service_healthy
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8080"
+      DB_URL: "jdbc:postgresql://lumariq-postgres:5432/dispatch"
+      DB_USER: "lumariq"
+      DB_PASSWORD: "lumariq_dev_pw"
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8 -Duser.timezone=UTC"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/ready >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 25
+    restart: unless-stopped
