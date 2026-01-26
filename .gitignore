@@ -5,3 +5,54 @@ dist
 nul
 **/nul
 services/ml-trust/wheels/*.whl
+
+# ops junk / local packs
+_ops_*
+_diag_*
+ops/archives/
+*.zip
+
+# local env
+.env
+
+# Lumariq ops/diag packs
+_OPS_PACK_*/
+_OPS_PACK_*.zip
+_diag_*/
+_ops_diag_*/
+_ops_pack_*/
+
+# --- Lumariq repo hygiene ---
+# Gradle / Kotlin
+.gradle/
+**/.gradle/
+**/build/
+**/out/
+**/.kotlin/
+**/.idea/
+**/*.iml
+
+# Local env / secrets
+.env
+.env.*
+*.local
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Triage / dumps / scratch
+_triage_*/
+_next_pack_*/
+_inspect_backend/
+_lumariq_backend_extract/
+_seed/
+canon/
+docs/_generated/
+*.bak.*
+*.BROKEN.*
+
+# Docker
+**/.dockerignore.bak*
+**/docker-compose*.bak*
